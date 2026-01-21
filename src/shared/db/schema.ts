@@ -1,6 +1,6 @@
 import { pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
 
-export const tbSystemInfo = pgTable("tb_system_info", {
+export const tbSystemInfo = pgTable("system_info", {
   id: uuid("id").defaultRandom().primaryKey(),
   key: text("key").notNull(),
   value: text("value").notNull(),
