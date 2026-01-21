@@ -1,0 +1,30 @@
+services:
+  postgres:
+    image: postgres:18
+    container_name: cinesaas_postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: cinesaas
+    ports:
+      - "5432:5432"
+    volumes:
+      - cinesaas_pgdata:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d cinesaas"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: cinesaas_pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@cinesaas.local
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5050:80"
+    depends_on:
+      postgres:
+        condition: service_healthy
+volumes:
+  cinesaas_pgdata:
