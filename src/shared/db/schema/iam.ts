@@ -27,9 +27,7 @@ export const tenants = iam.table(
       .defaultNow()
       .notNull(),
   },
-  (tenants) => ({
-    slugUq: uniqueIndex("tenants_slug_uq").on(tenants.slug),
-  }),
+  (t) => [uniqueIndex("tenants_slug_uq").on(t.slug)],
 );
 
 export const users = iam.table(
@@ -43,9 +41,7 @@ export const users = iam.table(
       .defaultNow()
       .notNull(),
   },
-  (users) => ({
-    emailUq: uniqueIndex("user_email_uq").on(users.email),
-  }),
+  (t) => [uniqueIndex("users_email_uq").on(t.email)]
 );
 
 export const memberships = iam.table(
@@ -63,10 +59,5 @@ export const memberships = iam.table(
       .defaultNow()
       .notNull(),
   },
-  (tenants) => ({
-    tenantUserUq: uniqueIndex("memberships_tenant_user_uq").on(
-      tenants.tenantId,
-      tenants.userId,
-    ),
-  }),
+ (t) => [uniqueIndex("memberships_tenant_user_uq").on(t.tenantId, t.userId)]
 );
