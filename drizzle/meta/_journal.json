@@ -8,6 +8,13 @@
       "when": 1768955830081,
       "tag": "0000_round_sersi",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1769471785421,
+      "tag": "0001_regular_madrox",
+      "breakpoints": true
     }
   ]
 }
