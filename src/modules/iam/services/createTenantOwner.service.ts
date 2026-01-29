@@ -1,0 +1,64 @@
+import type {
+  MembershipsRepository,
+  TenantsRepository,
+  UsersRepository,
+} from "../repositories/iam.repositories";
+import type {
+  CreateTenantOwnerInput,
+  CreateTenantOwnerOutput,
+} from "../dtos/createTenantOwner.dto";
+
+import { ApiError } from "src/shared/errors/api-error";
+import bcrypt from "bcryptjs";
+
+export class createTenantOwnerService {
+  constructor(
+    private tenantsRepo: TenantsRepository,
+    private usersRepo: UsersRepository,
+    private membershipsRepo: MembershipsRepository,
+  ) {}
+
+  async execute(
+    input: CreateTenantOwnerInput,
+  ): Promise<CreateTenantOwnerOutput> {
+    const slug = input.tenantSlug.trim().toLocaleLowerCase();
+    const email = input.ownerEmail.trim().toLocaleLowerCase();
+
+    if (!slug) throw new ApiError("Tenant slug is required", 400);
+    if (!email) throw new ApiError("Owner email is required", 400);
+    if (input.ownerPassword.length < 6)
+      throw new ApiError("Password must be at least 6 characters", 400);
+
+    const tenantAlreadyExists = await this.tenantsRepo.findBySlug(slug);
+    if (tenantAlreadyExists)
+      throw new ApiError("Tenant slug already in use", 409);
+
+    const userAlreadyExists = await this.usersRepo.findByEmail(email);
+    if (userAlreadyExists) throw new ApiError("Email already in use", 409);
+
+    const passwordHash = await bcrypt.hash(input.ownerPassword, 10);
+
+    const tenant = await this.tenantsRepo.create({
+      name: input.tenantName,
+      slug,
+    });
+
+    const user = await this.usersRepo.create({
+      email,
+      passwordHash,
+      isActive: true,
+    });
+
+    const membership = await this.membershipsRepo.create({
+      tenantId: tenant.id,
+      userId: user.id,
+      role: "OWNER",
+    });
+
+    return {
+      tenantId: tenant.id,
+      userId: user.id,
+      membershipId: membership.id,
+    };
+  }
+}

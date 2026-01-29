@@ -62,8 +62,11 @@ Infraestrutura (Postgres, Migrations, Cache, Fila)
 * [x] Modelagem multi-tenant (users, tenants, memberships)
 * [x] Schema IAM separado por domínio
 * [x] Migrations do IAM aplicadas
-* [x] Seed inicial (tenant + owner)
-* [ ] Primeiros services e controllers
+* [x] Seed inicial do IAM (tenant + owner)
+* [x] Repositories do IAM (Drizzle)
+* [ ] Services do IAM (casos de uso)
+* [ ] Transações (operações atômicas)
+* [ ] Controllers e rotas iniciais
 
 ### 🔜 Próximos módulos
 
@@ -72,6 +75,7 @@ Infraestrutura (Postgres, Migrations, Cache, Fila)
 * Reservas (concorrência e expiração)
 * Pedidos e checkout
 * Tickets e check-in
+* Suporte por IA (chatbot RAG multi-tenant)
 * Integração com API externa de filmes
 * Cache, filas e observabilidade
 * CI/CD e deploy
