@@ -1,5 +1,5 @@
 import { db } from "src/shared/db/client";
-import { MembershipInsert, MembershipsRepository } from "../iam.repositories";
+import { MembershipInsert, MembershipsRepository, type DbExecutor } from "../iam.repositories";
 import { memberships } from "src/shared/db/schema";
 import { and, eq } from "drizzle-orm";
 import { randomUUID } from "crypto";
@@ -8,8 +8,9 @@ export class DrizzleMembershipsRepository implements MembershipsRepository {
   async findByTenantAndUser(
     tenantId: string,
     userId: string,
-  ): Promise<{ id: string } | null> {
-    const result = await db
+    executor: DbExecutor = db,
+  ) {
+    const result = await executor
       .select({ id: memberships.id })
       .from(memberships)
       .where(
@@ -20,9 +21,9 @@ export class DrizzleMembershipsRepository implements MembershipsRepository {
     return result[0] ?? null;
   }
 
-  async create(data: MembershipInsert) {
+  async create(data: MembershipInsert, executor: DbExecutor = db) {
     const id = randomUUID();
-    await db.insert(memberships).values({ id, ...data });
+    await executor.insert(memberships).values({ id, ...data });
     return { id };
   }
 }

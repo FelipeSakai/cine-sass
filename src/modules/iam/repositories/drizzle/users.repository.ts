@@ -1,12 +1,12 @@
 import { db } from "src/shared/db/client";
-import { UserInsert, UsersRepository } from "../iam.repositories";
+import { UserInsert, UsersRepository, type DbExecutor } from "../iam.repositories";
 import { users } from "src/shared/db/schema";
 import { eq } from "drizzle-orm";
 import { randomUUID } from "crypto";
 
 export class DrizzleUsersRepository implements UsersRepository {
-  async findByEmail(email: string): Promise<{ id: string } | null> {
-    const result = await db
+  async findByEmail(email: string, executor: DbExecutor = db) {
+    const result = await executor
       .select({ id: users.id })
       .from(users)
       .where(eq(users.email, email))
@@ -15,9 +15,9 @@ export class DrizzleUsersRepository implements UsersRepository {
     return result[0] ?? null;
   }
 
-  async create(data: UserInsert) {
+  async create(data: UserInsert, executor: DbExecutor = db) {
     const id = randomUUID();
-    await db.insert(users).values({ id, ...data });
+    await executor.insert(users).values({ id, ...data });
     return { id };
   }
 }
