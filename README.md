@@ -59,15 +59,18 @@ Infraestrutura (Postgres, Migrations, Cache, Fila)
 
 ### 🚧 Módulo 1 — IAM (em andamento)
 
-* [x] Modelagem multi-tenant (users, tenants, memberships)
-* [x] Schema IAM separado por domínio
-* [x] Migrations do IAM aplicadas
-* [x] Seed inicial do IAM (tenant + owner)
-* [x] Repositories do IAM (Drizzle)
-* [ ] Services do IAM (casos de uso)
-* [ ] Transações (operações atômicas)
-* [ ] Controllers e rotas iniciais
 
+- [x] Modelagem multi-tenant (`tenants`, `users`, `memberships`)
+- [x] Schema PostgreSQL `iam`
+- [x] Migrations do IAM
+- [x] Seed inicial (tenant + owner)
+- [x] Repositories do IAM (Drizzle)
+- [x] Service `CreateTenantOwner`
+- [x] Factory de services (injeção de dependências)
+- [x] Controller `POST /tenants`
+- [ ] Testes E2E com banco real
+- [ ] Tratamento completo de conflitos (409)
+- [ ] Autenticação (login)
 ### 🔜 Próximos módulos
 
 * Catálogo (filmes, salas)
@@ -91,6 +94,7 @@ Infraestrutura (Postgres, Migrations, Cache, Fila)
 * **Docker & Docker Compose**
 * **Zod** — validação (env e inputs)
 * **Vitest** — testes (em breve)
+- **Jest + Supertest** — testes de integração (em implementação)
 
 ---
 

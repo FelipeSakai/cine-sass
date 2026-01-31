@@ -1,4 +1,5 @@
 import type {
+  DbExecutor,
   MembershipsRepository,
   TenantsRepository,
   UsersRepository,
@@ -7,12 +8,12 @@ import type {
   CreateTenantOwnerInput,
   CreateTenantOwnerOutput,
 } from "../dtos/createTenantOwner.dto";
-
 import { ApiError } from "src/shared/errors/api-error";
 import bcrypt from "bcryptjs";
 
-export class createTenantOwnerService {
+export class CreateTenantOwnerService {
   constructor(
+    private db: DbExecutor,
     private tenantsRepo: TenantsRepository,
     private usersRepo: UsersRepository,
     private membershipsRepo: MembershipsRepository,
@@ -29,36 +30,39 @@ export class createTenantOwnerService {
     if (input.ownerPassword.length < 6)
       throw new ApiError("Password must be at least 6 characters", 400);
 
-    const tenantAlreadyExists = await this.tenantsRepo.findBySlug(slug);
-    if (tenantAlreadyExists)
-      throw new ApiError("Tenant slug already in use", 409);
-
-    const userAlreadyExists = await this.usersRepo.findByEmail(email);
-    if (userAlreadyExists) throw new ApiError("Email already in use", 409);
-
     const passwordHash = await bcrypt.hash(input.ownerPassword, 10);
 
-    const tenant = await this.tenantsRepo.create({
-      name: input.tenantName,
-      slug,
-    });
+    const result = await this.db.transaction(async (tx) => {
+      const tenantAlreadyExists = await this.tenantsRepo.findBySlug(slug);
+      if (tenantAlreadyExists)
+        throw new ApiError("Tenant slug already in use", 409);
 
-    const user = await this.usersRepo.create({
-      email,
-      passwordHash,
-      isActive: true,
-    });
+      const userAlreadyExists = await this.usersRepo.findByEmail(email);
+      if (userAlreadyExists) throw new ApiError("Email already in use", 409);
 
-    const membership = await this.membershipsRepo.create({
-      tenantId: tenant.id,
-      userId: user.id,
-      role: "OWNER",
-    });
+      const tenant = await this.tenantsRepo.create(
+        { name: input.tenantName, slug },
+        tx,
+      );
+      const user = await this.usersRepo.create(
+        { email, passwordHash, isActive: true },
+        tx,
+      );
 
+      const membership = await this.membershipsRepo.create(
+        {
+          tenantId: tenant.id,
+          userId: user.id,
+          role: "OWNER",
+        },
+        tx,
+      );
+      return { tenant, user, membership };
+    });
     return {
-      tenantId: tenant.id,
-      userId: user.id,
-      membershipId: membership.id,
+      tenantId: result.tenant.id,
+      userId: result.user.id,
+      membershipId: result.membership.id,
     };
   }
 }
