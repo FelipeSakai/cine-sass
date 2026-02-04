@@ -1,5 +1,5 @@
 import { FastifyReply, FastifyRequest } from "fastify";
-import z from "zod";
+import { z } from "zod";
 import { makeCreateTenantOwnerService } from "../../factories/createTenantOwner.factory";
 
 const bodySchema = z.object({
@@ -26,7 +26,7 @@ export async function createTenantController(
 
   return reply.status(201).send({
     tenantId: result.tenantId,
-    ownerId: result.userId,
+    userId: result.userId,
     membershipId: result.membershipId,
   });
 }

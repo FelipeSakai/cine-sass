@@ -1,6 +1,6 @@
 import { pool } from "../shared/db/client";
 import { buildApp } from "./app";
-import { env } from "../shared/env";
+import { env } from "src/shared/env";
 
 let shuttingDown = false;
 
