@@ -25,11 +25,6 @@ export class CreateTenantOwnerService {
     const slug = input.tenantSlug.trim().toLocaleLowerCase();
     const email = input.ownerEmail.trim().toLocaleLowerCase();
 
-    if (!slug) throw new ApiError("Tenant slug is required", 400);
-    if (!email) throw new ApiError("Owner email is required", 400);
-    if (input.ownerPassword.length < 6)
-      throw new ApiError("Password must be at least 6 characters", 400);
-
     const passwordHash = await bcrypt.hash(input.ownerPassword, 10);
 
     const result = await this.db.transaction(async (tx) => {

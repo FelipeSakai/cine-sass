@@ -69,7 +69,7 @@ Infraestrutura (Postgres, Migrations, Cache, Fila)
 - [x] Factory de services (injeção de dependências)
 - [x] Controller `POST /tenants`
 - [x] Testes E2E com banco real
-- [ ] Tratamento completo de conflitos (409)
+- [x] Tratamento completo de conflitos (409)
 - [ ] Autenticação (login)
 ### 🔜 Próximos módulos
 

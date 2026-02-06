@@ -1,5 +1,6 @@
 import {
   boolean,
+  index,
   pgEnum,
   pgSchema,
   text,
@@ -41,7 +42,7 @@ export const users = iam.table(
       .defaultNow()
       .notNull(),
   },
-  (t) => [uniqueIndex("users_email_uq").on(t.email)]
+  (t) => [uniqueIndex("users_email_uq").on(t.email)],
 );
 
 export const memberships = iam.table(
@@ -59,5 +60,26 @@ export const memberships = iam.table(
       .defaultNow()
       .notNull(),
   },
- (t) => [uniqueIndex("memberships_tenant_user_uq").on(t.tenantId, t.userId)]
+  (t) => [uniqueIndex("memberships_tenant_user_uq").on(t.tenantId, t.userId)],
+);
+
+export const refreshTokens = iam.table(
+  "refresh_tokens",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    tokenHash: text("token_hash").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+    expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+    revokedAt: timestamp("revoked_at", { withTimezone: true }),
+    replacedByTokenId: uuid("replaced_by_token_id"),
+  },
+  (t) => [
+    index("refresh_token_user_id_idx").on(t.userId),
+    uniqueIndex("refresh_tokens_token_hash_uq").on(t.tokenHash),
+  ],
 );

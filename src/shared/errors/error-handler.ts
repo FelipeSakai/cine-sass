@@ -12,6 +12,7 @@ export function errorHandler(
   if (error instanceof ZodError) {
     return reply.status(400).send({
       message: "Validation error",
+      code: "VALIDATION_ERROR",
       issues: error.issues.map((i) => ({
         path: i.path.join("."),
         message: i.message,
@@ -22,6 +23,7 @@ export function errorHandler(
   if (error instanceof ApiError) {
     return reply.status(error.statusCode).send({
       message: error.message,
+      code: error.statusCode ?? "API_ERROR",
     });
   }
 
