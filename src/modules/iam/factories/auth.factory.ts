@@ -1,15 +1,23 @@
+import type { FastifyInstance } from "fastify";
+
 import { db } from "src/shared/db/client";
 import { DrizzleMembershipsRepository } from "../repositories/drizzle/memberships.repository";
 import { DrizzleRefreshTokensRepository } from "../repositories/drizzle/refreshTokens.repository";
-import { DrizzleTenantsRepository } from "../repositories/drizzle/tenants.repository";
 import { DrizzleUsersRepository } from "../repositories/drizzle/users.repository";
+import { AuthLoginService } from "../services/authLogin.service";
 
-export function makeAuthLoginService() {
+export function makeAuthLoginService(app: FastifyInstance) {
   const usersRepo = new DrizzleUsersRepository();
-  const membershipRepo = new DrizzleMembershipsRepository();
-  const tenantRepo = new DrizzleTenantsRepository();
+  const membershipsRepo = new DrizzleMembershipsRepository();
+  const refreshTokensRepo = new DrizzleRefreshTokensRepository();
 
-  //return new AuthLoginService(db, usersRepo, membershipRepo, refershTokensRepo);
+  return new AuthLoginService(
+    db,
+    usersRepo,
+    membershipsRepo,
+    refreshTokensRepo,
+    (payload) => app.jwt.sign(payload),
+  );
 }
 
 export function makeAuthRefreshService() {

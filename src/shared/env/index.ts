@@ -1,9 +1,12 @@
 import "dotenv/config";
-import { z } from "zod";
+import { number, string, z } from "zod";
 
 const envSchema = z.object({
   DATABASE_URL: z.string().min(1),
   PORT: z.coerce.number().default(3333),
+
+  JWT_SECRET: z.string().min(32),
+  JWT_ACCESS_TTL: string().default("15m"),
 });
 
 const parsed = envSchema.safeParse(process.env);

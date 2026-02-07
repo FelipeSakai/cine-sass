@@ -1,12 +1,12 @@
 import { DbExecutor } from "./iam.repositories";
 
-export type RefreshTokenCreateData = {
+export type RefreshTokensCreateData = {
   userId: string;
   tokenHash: string;
   expiresAt: Date;
 };
 
-export type RefreshTokenRecord = {
+export type RefreshsTokenRecord = {
   id: string;
   userId: string;
   tokenHash: string;
@@ -16,15 +16,15 @@ export type RefreshTokenRecord = {
   replacedByTokenId: string | null;
 };
 
-export interface RefreshTokenRepository {
+export interface RefreshTokensRepository {
   create(
-    data: RefreshTokenCreateData,
+    data: RefreshTokensCreateData,
     executor?: DbExecutor,
-  ): Promise<RefreshTokenRecord>;
+  ): Promise<RefreshsTokenRecord>;
   findByTokenHash(
     tokenHash: string,
     executor?: DbExecutor,
-  ): Promise<RefreshTokenRecord | null>;
+  ): Promise<RefreshsTokenRecord | null>;
   revoke(
     tokenId: string,
     data: { revokedAt: Date; replacedByTokenId?: string | null },

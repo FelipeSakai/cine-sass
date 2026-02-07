@@ -1,5 +1,9 @@
 import { db } from "src/shared/db/client";
-import { UserInsert, UsersRepository, type DbExecutor } from "../iam.repositories";
+import {
+  UserInsert,
+  UsersRepository,
+  type DbExecutor,
+} from "../iam.repositories";
 import { users } from "src/shared/db/schema";
 import { eq } from "drizzle-orm";
 import { randomUUID } from "crypto";
@@ -7,7 +11,12 @@ import { randomUUID } from "crypto";
 export class DrizzleUsersRepository implements UsersRepository {
   async findByEmail(email: string, executor: DbExecutor = db) {
     const result = await executor
-      .select({ id: users.id })
+      .select({
+        id: users.id,
+        isActive: users.isActive,
+        email: users.email,
+        passwordHash: users.passwordHash,
+      })
       .from(users)
       .where(eq(users.email, email))
       .limit(1);

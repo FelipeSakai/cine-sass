@@ -13,7 +13,7 @@ export type LoginInput = {
 };
 
 export type LoginOutput = {
-  acessToken: string;
+  accessToken: string;
   refreshToken: string;
   memberships: AuthMembershipDTO[];
   defaultTenantId?: string;
