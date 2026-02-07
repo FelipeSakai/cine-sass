@@ -1,108 +1,136 @@
-# 🎬 CineSaaS — Backend
+# 🎬 CineSaaS — Backend (SaaS Multi-Tenant)
 
-Backend de um **SaaS multi-tenant para cinemas**, desenvolvido com foco em **arquitetura backend moderna**, boas práticas e **evolução incremental até produção**.
+Backend de um **SaaS multi-tenant para cinemas**, desenvolvido com foco em **arquitetura backend de nível profissional**, boas práticas e **padrões usados em sistemas reais de produção**.
 
-O projeto é construído **por módulos**, cada um com entregas bem definidas, abordando desde a fundação do sistema até autenticação, multi-tenant, reservas, vendas, filas, cache, observabilidade e CI/CD.
+Este projeto foi pensado como **portfólio avançado**, abordando desde **fundação arquitetural**, passando por **autenticação moderna**, **multi-tenant**, **concorrência**, até **observabilidade, CI/CD e IA aplicada (RAG)**.
 
 ---
 
 ## 🚀 Visão Geral
 
-O **CineSaaS** permite que **vários cinemas (tenants)** utilizem a mesma plataforma para:
+O **CineSaaS** permite que **vários cinemas (tenants)** utilizem a mesma aplicação para:
 
-* gerenciar usuários e permissões
-* cadastrar filmes, salas e sessões
-* reservar assentos
-* vender ingressos
-* validar tickets
-* operar com segurança em ambiente de produção
+- gerenciar usuários e permissões
+- cadastrar filmes, salas e sessões
+- reservar assentos com segurança
+- vender ingressos
+- validar tickets (check-in)
+- operar com isolamento total de dados
+- oferecer **suporte por IA isolado por tenant**
 
-Tudo isso mantendo **isolamento de dados por tenant** e uma arquitetura preparada para escalar.
+Tudo isso com uma arquitetura **preparada para escalar**, evoluir e ser mantida em produção.
+
+---
+
+## 🧠 Diferenciais Técnicos
+
+- ✅ **Multi-tenant real**, não apenas “flag no banco”
+- ✅ **Arquitetura modular orientada a domínio**
+- ✅ **JWT + Refresh Token** com persistência e hash
+- ✅ **Transações explícitas** para operações críticas
+- ✅ **Testes E2E com banco real**
+- ✅ **Separação clara de responsabilidades**
+- ✅ Base preparada para **concorrência, cache e IA**
+
+> Este projeto prioriza **clareza arquitetural e decisões conscientes**, não apenas features.
 
 ---
 
 ## 🧱 Arquitetura
 
-O projeto segue uma **arquitetura modular orientada a domínio**, inspirada em Clean Architecture:
+Arquitetura inspirada em **Clean Architecture**, adaptada para SaaS:
 
-```
 HTTP (Fastify)
-   ↓
-Módulos de Domínio (IAM, Catalog, Schedule, ...)
-   ↓
-Infraestrutura (Postgres, Migrations, Cache, Fila)
-```
+↓
+Controllers (HTTP + validação)
+↓
+Services (casos de uso / regras de negócio)
+↓
+Repositories (Drizzle ORM)
+↓
+PostgreSQL (schemas por domínio)
 
-### Principais decisões
 
-* **PostgreSQL com schemas por domínio**
-* **Multi-tenant explícito** via `tenant_id`
-* **Migrations versionadas** com Drizzle
-* **Controllers finos**, regras concentradas nos serviços
-* Infra desacoplada do domínio
+### Decisões importantes
+
+- **PostgreSQL com schemas por domínio**
+- **Multi-tenant explícito** via `tenant_id`
+- **Migrations versionadas** com Drizzle
+- **Controllers finos**, regras nos services
+- **Infra desacoplada do domínio**
+- Testes pensados desde o início
 
 ---
 
-## 🧩 Módulos (Roadmap)
+## 🧩 Roadmap de Módulos
 
 ### ✅ Módulo 0 — Foundation (concluído)
+Base profissional do projeto:
+- Node.js + TypeScript
+- Fastify
+- Docker + PostgreSQL
+- Drizzle ORM + migrations
+- Logger estruturado
+- Error handler global
+- Healthcheck (`/health`)
+- Graceful shutdown
 
-* [x] Node.js + TypeScript
-* [x] Scripts `dev`, `build`, `start`
-* [x] Docker + PostgreSQL
-* [x] Drizzle ORM + migrations
-* [x] Primeira migration (pipeline validado)
-* [x] Fastify com endpoint `/health`
-* [x] Logger estruturado
-* [x] Error handler global
-* [x] Graceful shutdown
+---
 
-### 🚧 Módulo 1 — IAM (em andamento)
+### 🚧 Módulo 1 — IAM / Auth (em andamento)
+Autenticação e identidade:
+- Multi-tenant (`tenants`, `users`, `memberships`)
+- JWT (access token)
+- Refresh token persistido com hash
+- Factories para injeção de dependências
+- Controllers REST
+- Testes E2E com banco real
+- Tratamento completo de erros HTTP
+- 🔜 Refresh token com rotação
+- 🔜 Logout
+- 🔜 Migração de hash para **Argon2**
 
+---
 
-- [x] Modelagem multi-tenant (`tenants`, `users`, `memberships`)
-- [x] Schema PostgreSQL `iam`
-- [x] Migrations do IAM
-- [x] Seed inicial (tenant + owner)
-- [x] Repositories do IAM (Drizzle)
-- [x] Service `CreateTenantOwner`
-- [x] Factory de services (injeção de dependências)
-- [x] Controller `POST /tenants`
-- [x] Testes E2E com banco real
-- [x] Tratamento completo de conflitos (409)
-- [ ] Autenticação (login)
-### 🔜 Próximos módulos
+### 🔜 Próximos módulos (planejados)
 
-* Catálogo (filmes, salas)
-* Programação (sessões)
-* Reservas (concorrência e expiração)
-* Pedidos e checkout
-* Tickets e check-in
-* Suporte por IA (chatbot RAG multi-tenant)
-* Integração com API externa de filmes
-* Cache, filas e observabilidade
-* CI/CD e deploy
+- Multi-tenant & RBAC (middlewares e roles)
+- Catálogo (filmes, salas)
+- Programação (sessões)
+- Assentos e reservas com concorrência
+- Pedidos e checkout
+- Tickets e check-in
+- **Chatbot com IA (RAG multi-tenant)**
+- Cache, filas e observabilidade
+- CI/CD e deploy automatizado
 
 ---
 
 ## 🛠️ Stack Tecnológica
 
-* **Node.js + TypeScript**
-* **Fastify** — servidor HTTP
-* **PostgreSQL 18** — banco de dados
-* **Drizzle ORM** — schema e migrations
-* **Docker & Docker Compose**
-* **Zod** — validação (env e inputs)
-* **Vitest** — testes (em breve)
-- **Jest + Supertest** — testes de integração (em implementação)
+- **Node.js + TypeScript**
+- **Fastify**
+- **PostgreSQL 18**
+- **Drizzle ORM**
+- **Docker & Docker Compose**
+- **Zod**
+- **JWT + Refresh Token**
+- **Vitest + Supertest**
+- **Redis** (planejado)
+- **pgvector** (IA / embeddings)
 
 ---
 
-## 🧪 Estado atual
+## 🧪 Estado do Projeto
 
-Este projeto está em **desenvolvimento ativo** e segue uma abordagem **educacional + profissional**, com foco em aprendizado profundo de backend.
+Projeto em **desenvolvimento ativo**, com foco em:
 
-Commits e decisões são feitos de forma incremental e consciente, priorizando **entendimento antes de complexidade**.
+- aprendizado profundo
+- decisões arquiteturais reais
+- código legível e testável
+- práticas próximas de produção
+
+Commits refletem **evolução incremental**, não soluções “mágicas”.
 
 ---
 
@@ -110,15 +138,18 @@ Commits e decisões são feitos de forma incremental e consciente, priorizando *
 
 Este projeto serve como:
 
-* portfólio backend avançado
-* laboratório de arquitetura SaaS
-* base para estudos de produção (CI/CD, observabilidade, escalabilidade)
+- **portfólio backend avançado**
+- **laboratório de arquitetura SaaS**
+- base para estudos de:
+  - autenticação moderna
+  - multi-tenant
+  - concorrência
+  - observabilidade
+  - integração com IA
 
 ---
 
 ## 👤 Autor
 
-**Felipe Sakai**
-Desenvolvedor Backend
-
----
+**Felipe Sakai**  
+Desenvolvedor Backend  
