@@ -39,6 +39,15 @@ export interface UsersRepository {
     isActive: boolean;
     passwordHash: string;
   } | null>;
+  findById(
+    id: string,
+    executor?: DbExecutor,
+  ): Promise<{
+    id: string;
+    email: string;
+    isActive: boolean;
+    passwordHash: string;
+  } | null>;
 }
 
 export interface MembershipsRepository {

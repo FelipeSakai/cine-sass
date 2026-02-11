@@ -1,6 +1,6 @@
 import request from "supertest";
 import { describe, expect, it, beforeAll, afterAll } from "vitest";
-import { buildApp } from "../../../../../http/app";
+import { buildApp } from "../../../../http/app";
 import { FastifyInstance } from "fastify";
 
 let app: FastifyInstance;
@@ -59,7 +59,7 @@ describe("POST /tenants", () => {
   });
 
   it("should return 409 when ownerEmail already exists", async () => {
-    const res = await request(app.server).post("/tenants").send({
+    await request(app.server).post("/tenants").send({
       tenantName: "Cine Sakai",
       tenantSlug: "cine-sakai",
       ownerEmail: "owner@cine.com",

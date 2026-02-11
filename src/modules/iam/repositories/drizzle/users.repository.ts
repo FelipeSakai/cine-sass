@@ -24,6 +24,21 @@ export class DrizzleUsersRepository implements UsersRepository {
     return result[0] ?? null;
   }
 
+  async findById(id: string, executor: DbExecutor = db) {
+    const result = await executor
+      .select({
+        id: users.id,
+        isActive: users.isActive,
+        email: users.email,
+        passwordHash: users.passwordHash,
+      })
+      .from(users)
+      .where(eq(users.id, id))
+      .limit(1);
+
+    return result[0] ?? null;
+  }
+
   async create(data: UserInsert, executor: DbExecutor = db) {
     const id = randomUUID();
     await executor.insert(users).values({ id, ...data });

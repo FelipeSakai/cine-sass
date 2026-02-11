@@ -5,6 +5,7 @@ import { DrizzleMembershipsRepository } from "../repositories/drizzle/membership
 import { DrizzleRefreshTokensRepository } from "../repositories/drizzle/refreshTokens.repository";
 import { DrizzleUsersRepository } from "../repositories/drizzle/users.repository";
 import { AuthLoginService } from "../services/authLogin.service";
+import { AuthRefreshService } from "../services/authRefresh.service";
 
 export function makeAuthLoginService(app: FastifyInstance) {
   const usersRepo = new DrizzleUsersRepository();
@@ -20,9 +21,11 @@ export function makeAuthLoginService(app: FastifyInstance) {
   );
 }
 
-export function makeAuthRefreshService() {
+export function makeAuthRefreshService(app: FastifyInstance) {
+  const refreshTokensRepo = new DrizzleRefreshTokensRepository();
   const usersRepo = new DrizzleUsersRepository();
-  const refershTokensRepo = new DrizzleRefreshTokensRepository();
 
-  //return new makeAuthRefreshService(db, usersRepo, refershTokensRepo);
+  return new AuthRefreshService(db, usersRepo, refreshTokensRepo, (payload) =>
+    app.jwt.sign(payload),
+  );
 }

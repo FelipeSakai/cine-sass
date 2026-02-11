@@ -88,7 +88,6 @@ Autenticação e identidade:
 - Tratamento completo de erros HTTP
 - 🔜 Refresh token com rotação
 - 🔜 Logout
-- 🔜 Migração de hash para **Argon2**
 
 ---
 

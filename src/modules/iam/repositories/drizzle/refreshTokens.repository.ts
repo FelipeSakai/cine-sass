@@ -6,6 +6,7 @@ import {
 } from "../refreshTokens.repository";
 import { refreshTokens } from "src/shared/db/schema";
 import { eq } from "drizzle-orm";
+import { randomUUID } from "crypto";
 
 export class DrizzleRefreshTokensRepository implements RefreshTokensRepository {
   private getExecutor(executor?: DbExecutor) {
@@ -14,9 +15,11 @@ export class DrizzleRefreshTokensRepository implements RefreshTokensRepository {
 
   async create(data: RefreshTokensCreateData, executor?: DbExecutor) {
     const dbExecutor = this.getExecutor(executor);
+    const id = randomUUID();
     const [row] = await dbExecutor
       .insert(refreshTokens)
       .values({
+        id,
         userId: data.userId,
         tokenHash: data.tokenHash,
         expiresAt: data.expiresAt,
@@ -29,7 +32,15 @@ export class DrizzleRefreshTokensRepository implements RefreshTokensRepository {
   async findByTokenHash(tokenHash: string, executor?: DbExecutor) {
     const dbExecutor = this.getExecutor(executor);
     const [row] = await dbExecutor
-      .select()
+      .select({
+        id: refreshTokens.id,
+        userId: refreshTokens.userId,
+        tokenHash: refreshTokens.tokenHash,
+        createdAt: refreshTokens.createdAt,
+        expiresAt: refreshTokens.expiresAt,
+        revokedAt: refreshTokens.revokedAt,
+        replacedByTokenId: refreshTokens.replacedByTokenId,
+      })
       .from(refreshTokens)
       .where(eq(refreshTokens.tokenHash, tokenHash))
       .limit(1);
