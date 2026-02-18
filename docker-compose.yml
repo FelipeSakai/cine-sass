@@ -9,7 +9,7 @@ services:
     ports:
       - "5433:5432"
     volumes:
-      - cinesaas_pgdata:/var/lib/postgresql
+      - cinesaas_pgdata:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres -d cinesaas"]
       interval: 5s
