@@ -15,7 +15,12 @@ export class DrizzleMembershipsRepository implements MembershipsRepository {
     executor: DbExecutor = db,
   ) {
     const result = await executor
-      .select({ id: memberships.id })
+      .select({
+        id: memberships.id,
+        tenantId: memberships.tenantId,
+        userId: memberships.userId,
+        role: memberships.role,
+      })
       .from(memberships)
       .where(
         and(eq(memberships.tenantId, tenantId), eq(memberships.userId, userId)),

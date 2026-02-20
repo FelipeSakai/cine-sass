@@ -1,9 +1,6 @@
 import type { FastifyReply, FastifyRequest } from "fastify";
 import { z } from "zod";
-import {
-  makeAuthLoginService,
-  makeAuthLogoutService,
-} from "../../factories/auth.factory";
+import { makeAuthLogoutService } from "../../factories/makeAuthLogoutService.factory";
 
 const bodySchema = z.object({
   refreshToken: z.string().min(10),

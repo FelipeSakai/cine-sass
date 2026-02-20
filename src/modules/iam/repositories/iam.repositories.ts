@@ -12,6 +12,13 @@ export type MembershipSummary = {
   role: membershipRole;
 };
 
+export type MembershipDetails = {
+  id: string;
+  tenantId: string;
+  userId: string;
+  role: membershipRole;
+};
+
 export type DbExecutor = Omit<typeof db, "$client">;
 
 export interface TenantsRepository {
@@ -63,5 +70,5 @@ export interface MembershipsRepository {
     tenantId: string,
     userId: string,
     executor?: DbExecutor,
-  ): Promise<{ id: string } | null>;
+  ): Promise<MembershipDetails | null>;
 }
