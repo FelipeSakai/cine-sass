@@ -1,4 +1,5 @@
 import fastify from "fastify";
+import { Role } from "src/modules/iam/domain/role";
 
 declare module "fastify" {
   interface FastifyRequest {
@@ -9,7 +10,7 @@ declare module "fastify" {
       id: string;
       tenantId: string;
       userId: string;
-      role: "OWNER" | "ADMIN" | "STAFF" | "VIEWER";
+      role: Role;
     };
   }
 }
