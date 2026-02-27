@@ -18,6 +18,7 @@ export const membershipRole = pgEnum("membership_role", [
   "VIEWER",
 ]);
 
+
 export const tenants = iam.table(
   "tenants",
   {

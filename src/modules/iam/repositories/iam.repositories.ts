@@ -1,7 +1,7 @@
 import { type InferInsertModel } from "drizzle-orm";
 import { memberships, tenants, users } from "../../../shared/db/schema";
 import { db } from "src/shared/db/client";
-import { membershipRole } from "../dtos/auth.dto";
+import { Role } from "../domain/role";
 
 export type TenantInsert = InferInsertModel<typeof tenants>;
 export type UserInsert = InferInsertModel<typeof users>;
@@ -9,14 +9,14 @@ export type MembershipInsert = InferInsertModel<typeof memberships>;
 
 export type MembershipSummary = {
   tenantId: string;
-  role: membershipRole;
+  role: Role;
 };
 
 export type MembershipDetails = {
   id: string;
   tenantId: string;
   userId: string;
-  role: membershipRole;
+  role: Role;
 };
 
 export type DbExecutor = Omit<typeof db, "$client">;

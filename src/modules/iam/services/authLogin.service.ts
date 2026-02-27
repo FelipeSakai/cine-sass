@@ -1,5 +1,5 @@
 import { ApiError } from "src/shared/errors/api-error";
-import { LoginInput, LoginOutput } from "../dtos/auth.dto";
+import { LoginInput, LoginOutput } from "../dtos/authLogin.dto";
 import {
   DbExecutor,
   MembershipsRepository,
