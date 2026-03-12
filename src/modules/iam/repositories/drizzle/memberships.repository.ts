@@ -4,9 +4,10 @@ import {
   MembershipInsert,
   MembershipsRepository,
   MembershipSummary,
+  TenantMemberListItem,
   type DbExecutor,
 } from "../iam.repositories";
-import { memberships } from "src/shared/db/schema";
+import { memberships, users } from "src/shared/db/schema";
 import { and, eq } from "drizzle-orm";
 import { randomUUID } from "crypto";
 import { Role } from "../../domain/role";
@@ -16,6 +17,27 @@ function toRole(value: string): Role {
 }
 
 export class DrizzleMembershipsRepository implements MembershipsRepository {
+  async findManyByTenantId(
+  tenantId: string,
+  executor: DbExecutor = db,
+) {
+  const rows = await executor
+    .select({
+      userId: memberships.userId,
+      email: users.email,
+      role: memberships.role,
+    })
+    .from(memberships)
+    .innerJoin(users, eq(users.id, memberships.userId))
+    .where(eq(memberships.tenantId, tenantId));
+
+  return rows.map((row) => ({
+    userId: row.userId,
+    email: row.email,
+    role: row.role as Role,
+  }));
+}
+
   async findByTenantAndUser(
     tenantId: string,
     userId: string,

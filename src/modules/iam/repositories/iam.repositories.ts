@@ -19,6 +19,12 @@ export type MembershipDetails = {
   role: Role;
 };
 
+export type TenantMemberListItem = {
+  userId: string;
+  email: string;
+  role: Role;
+};
+
 export type DbExecutor = Omit<typeof db, "$client">;
 
 export interface TenantsRepository {
@@ -63,7 +69,7 @@ export interface MembershipsRepository {
     executor?: DbExecutor,
   ): Promise<{ id: string }>;
   findManyByUserId(
-    UserId: string,
+    userId: string,
     executor?: DbExecutor,
   ): Promise<MembershipSummary[]>;
   findByTenantAndUser(
@@ -71,4 +77,8 @@ export interface MembershipsRepository {
     userId: string,
     executor?: DbExecutor,
   ): Promise<MembershipDetails | null>;
+  findManyByTenantId(
+    tenantId: string,
+    executor?: DbExecutor,
+  ): Promise<TenantMemberListItem[]>;
 }
