@@ -1,6 +1,6 @@
 import type { FastifyReply, FastifyRequest } from "fastify";
 import { z } from "zod";
-import { makeAuthLoginService } from "../../factories/makeAuthLoginService.factory";
+import { makeAuthLoginService } from "../../factories/make-auth-login-service.factory";
 
 const bodySchema = z.object({
   email: z.email(),

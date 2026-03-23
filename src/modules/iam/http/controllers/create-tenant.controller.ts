@@ -1,6 +1,6 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import { z } from "zod";
-import { makeCreateTenantOwnerService } from "../../factories/makeCreateTenantOwnerService.factory";
+import { makeCreateTenantOwnerService } from "../../factories/make-create-tenant-owner-service.factory";
 
 const bodySchema = z.object({
   tenantName: z.string().min(2),

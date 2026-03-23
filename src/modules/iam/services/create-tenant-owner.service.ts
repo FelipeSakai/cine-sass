@@ -7,7 +7,7 @@ import type {
 import type {
   CreateTenantOwnerInput,
   CreateTenantOwnerOutput,
-} from "../dtos/createTenantOwner.dto";
+} from "../dtos/create-tenant-owner.dto";
 import { ApiError } from "src/shared/errors/api-error";
 import bcrypt from "bcryptjs";
 

@@ -1,5 +1,5 @@
 import { FastifyReply, FastifyRequest } from "fastify";
-import { makeGetMeService } from "../../factories/makeGetMeService.factory";
+import { makeGetMeService } from "../../factories/make-get-me-service.factory";
 
 export async function meController(
   request: FastifyRequest,

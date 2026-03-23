@@ -1,7 +1,7 @@
 import { FastifyInstance } from "fastify";
-import { authLoginController } from "./controllers/authLogin.controller";
-import { authRefreshController } from "./controllers/authRefresh.controller";
-import { authLogoutController } from "./controllers/authLogout.controller";
+import { authLoginController } from "./controllers/auth-login.controller";
+import { authRefreshController } from "./controllers/auth-refresh.controller";
+import { authLogoutController } from "./controllers/auth-logout.controller";
 
 export async function registerAuthRoutes(app: FastifyInstance) {
   app.post("/auth/login", authLoginController);

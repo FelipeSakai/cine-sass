@@ -1,6 +1,6 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import z from "zod";
-import { makeGetMembershipService } from "../../factories/makeGetMembershipService.factory";
+import { makeGetMembershipService } from "../../factories/make-get-membership-service.factory";
 
 const tenantIdSchema = z.uuid();
 

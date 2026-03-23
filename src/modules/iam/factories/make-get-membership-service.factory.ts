@@ -1,5 +1,5 @@
 import { DrizzleMembershipsRepository } from "../repositories/drizzle/memberships.repository";
-import { GetMembershipService } from "../services/getMembership.service";
+import { GetMembershipService } from "../services/get-membership.service";
 
 export function makeGetMembershipService() {
   const membershipsRepo = new DrizzleMembershipsRepository();

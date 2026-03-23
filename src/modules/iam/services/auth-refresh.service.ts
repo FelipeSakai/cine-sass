@@ -1,8 +1,8 @@
 import { ApiError } from "src/shared/errors/api-error";
 import type { DbExecutor, UsersRepository } from "../repositories/iam.repositories";
-import type { RefreshTokensRepository } from "../repositories/refreshTokens.repository";
+import type { RefreshTokensRepository } from "../repositories/refresh-tokens.repository";
 import crypto from "node:crypto";
-import { RefreshInput, RefreshOutput } from "../dtos/authRefresh.dto";
+import { RefreshInput, RefreshOutput } from "../dtos/auth-refresh.dto";
 
 type SignAccessToken = (payload: { sub: string }) => Promise<string> | string;
 

@@ -1,6 +1,6 @@
 import { DrizzleMembershipsRepository } from "../repositories/drizzle/memberships.repository";
 import { DrizzleUsersRepository } from "../repositories/drizzle/users.repository";
-import { CreateMemberService } from "../services/createMember.service";
+import { CreateMemberService } from "../services/create-member.service";
 
 export function makeCreateMemberService() {
   return new CreateMemberService(

@@ -1,7 +1,7 @@
 import type { FastifyReply, FastifyRequest } from "fastify";
 import { z } from "zod";
 import { Role } from "../../domain/role";
-import { makeCreateMemberService } from "../../factories/makeCreateMemberService";
+import { makeCreateMemberService } from "../../factories/make-create-member-service.factory";
 
 const bodySchema = z.object({
   email: z.string().email(),

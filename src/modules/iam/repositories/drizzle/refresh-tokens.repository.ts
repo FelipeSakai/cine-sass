@@ -3,7 +3,7 @@ import { DbExecutor } from "../iam.repositories";
 import {
   RefreshTokensCreateData,
   RefreshTokensRepository,
-} from "../refreshTokens.repository";
+} from "../refresh-tokens.repository";
 import { refreshTokens } from "src/shared/db/schema";
 import { eq } from "drizzle-orm";
 import { randomUUID } from "crypto";

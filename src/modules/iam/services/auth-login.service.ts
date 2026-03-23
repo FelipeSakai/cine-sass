@@ -1,11 +1,11 @@
 import { ApiError } from "src/shared/errors/api-error";
-import { LoginInput, LoginOutput } from "../dtos/authLogin.dto";
+import { LoginInput, LoginOutput } from "../dtos/auth-login.dto";
 import {
   DbExecutor,
   MembershipsRepository,
   UsersRepository,
 } from "../repositories/iam.repositories";
-import { RefreshTokensRepository } from "../repositories/refreshTokens.repository";
+import { RefreshTokensRepository } from "../repositories/refresh-tokens.repository";
 import bcrypt from "bcryptjs";
 import crypto from "node:crypto";
 

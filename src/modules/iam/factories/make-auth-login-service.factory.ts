@@ -2,9 +2,9 @@ import type { FastifyInstance } from "fastify";
 
 import { db } from "src/shared/db/client";
 import { DrizzleMembershipsRepository } from "../repositories/drizzle/memberships.repository";
-import { DrizzleRefreshTokensRepository } from "../repositories/drizzle/refreshTokens.repository";
+import { DrizzleRefreshTokensRepository } from "../repositories/drizzle/refresh-tokens.repository";
 import { DrizzleUsersRepository } from "../repositories/drizzle/users.repository";
-import { AuthLoginService } from "../services/authLogin.service";
+import { AuthLoginService } from "../services/auth-login.service";
 
 export function makeAuthLoginService(app: FastifyInstance) {
   const usersRepo = new DrizzleUsersRepository();

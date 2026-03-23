@@ -81,4 +81,10 @@ export interface MembershipsRepository {
     tenantId: string,
     executor?: DbExecutor,
   ): Promise<TenantMemberListItem[]>;
+  updateRole(
+    tenantId: string,
+    userId: string,
+    role: Role,
+    executor?: DbExecutor,
+  ): Promise<void>;
 }

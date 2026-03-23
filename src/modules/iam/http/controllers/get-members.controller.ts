@@ -1,5 +1,5 @@
 import { FastifyReply, FastifyRequest } from "fastify";
-import { makeGetMembersService } from "../../factories/makeGetMembersService";
+import { makeGetMembersService } from "../../factories/make-get-members-service.factory";
 
 export async function getMembersController(
   request: FastifyRequest,

@@ -1,19 +1,18 @@
 import type { FastifyReply, FastifyRequest } from "fastify";
 import { z } from "zod";
-import { makeAuthLogoutService } from "../../factories/makeAuthLogoutService.factory";
-
+import { makeAuthRefreshService } from "../../factories/make-auth-refresh-service.factory";
 const bodySchema = z.object({
   refreshToken: z.string().min(10),
 });
 
-export async function authLogoutController(
+export async function authRefreshController(
   req: FastifyRequest,
   reply: FastifyReply,
 ) {
   const body = bodySchema.parse(req.body);
 
-  const service = makeAuthLogoutService(req.server);
+  const service = makeAuthRefreshService(req.server);
   const result = await service.execute(body);
 
-  return reply.status(204).send(result);
+  return reply.status(200).send(result);
 }

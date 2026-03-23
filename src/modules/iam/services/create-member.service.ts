@@ -3,7 +3,7 @@ import { Role } from "../domain/role";
 import type {
   CreateMemberInput,
   CreateMemberOutput,
-} from "../dtos/createMember.dto";
+} from "../dtos/create-member.dto";
 import {
   DbExecutor,
   MembershipsRepository,
