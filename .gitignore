@@ -2,3 +2,4 @@ node_modules
 roadmap.md
 .env
 postman_collection.json
+dist/

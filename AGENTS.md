@@ -182,6 +182,7 @@ Observacao importante: o contexto multi-tenant atual e explicito e simples. Isso
 - Acesso ao banco deve passar por repositories sempre que fizer sentido
 - Factories sao o mecanismo atual de injecao de dependencia
 - Nomes de arquivos TypeScript do dominio devem usar kebab-case com sufixos explicitos, por exemplo `update-member-role.controller.ts`, `auth-refresh.service.ts` e `make-auth-login-service.factory.ts`
+- Artefatos de build em `dist/` nao devem ser versionados; gerar localmente via `npm run build`
 - Operacoes criticas devem preferir transacoes explicitas
 - Multi-tenant deve continuar explicito, nao escondido magicamente em infra
 - Testes devem priorizar comportamento real via HTTP + banco quando o caso justificar
