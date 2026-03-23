@@ -108,6 +108,7 @@ Ja existe implementacao para:
 - validacao de tenant por header `x-tenant-id`
 - RBAC basico por membership role
 - criacao e listagem de membros do tenant
+- remocao de membro do tenant por exclusao de membership
 - endpoints de teste/protecao para auth, tenant e role
 
 ### Rotas atuais
@@ -128,6 +129,7 @@ Rotas protegidas:
 - `GET /protected/admin-ping`
 - `POST /members`
 - `GET /members`
+- `DELETE /members/:userId`
 
 ## Modelo de dados atual
 
@@ -205,6 +207,7 @@ Cobertura atual relevante:
 - `/me`
 - caso basico de RBAC
 - update de role de membro
+- remocao de membro
 
 Lacunas percebidas hoje:
 

@@ -16,6 +16,18 @@ function toRole(value: string): Role {
 }
 
 export class DrizzleMembershipsRepository implements MembershipsRepository {
+  async deleteByTenantAndUser(
+    tenantId: string,
+    userId: string,
+    executor: DbExecutor = db,
+  ) {
+    await executor
+      .delete(memberships)
+      .where(
+        and(eq(memberships.tenantId, tenantId), eq(memberships.userId, userId)),
+      );
+  }
+
   async updateRole(
     tenantId: string,
     userId: string,

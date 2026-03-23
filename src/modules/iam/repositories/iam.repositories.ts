@@ -87,4 +87,9 @@ export interface MembershipsRepository {
     role: Role,
     executor?: DbExecutor,
   ): Promise<void>;
+  deleteByTenantAndUser(
+    tenantId: string,
+    userId: string,
+    executor?: DbExecutor,
+  ): Promise<void>;
 }

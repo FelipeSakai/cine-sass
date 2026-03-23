@@ -11,6 +11,7 @@ import { Role } from "../domain/role";
 import { requireRole } from "./middlewares/require-role";
 import { adminPingController } from "./controllers/admin-ping.controller";
 import { createMemberController } from "./controllers/create-member.controller";
+import { deleteMemberController } from "./controllers/delete-member.controller";
 import { getMembersController } from "./controllers/get-members.controller";
 
 export async function registerIamRoutes(app: FastifyInstance) {
@@ -46,6 +47,17 @@ export async function registerIamRoutes(app: FastifyInstance) {
       ],
     },
     createMemberController,
+  );
+  app.delete(
+    "/members/:userId",
+    {
+      preHandler: [
+        requireAuth,
+        requireTenant,
+        requireRole([Role.OWNER, Role.ADMIN]),
+      ],
+    },
+    deleteMemberController,
   );
   app.get(
     "/members",
