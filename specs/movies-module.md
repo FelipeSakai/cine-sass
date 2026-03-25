@@ -31,6 +31,18 @@ This keeps the project realistic without turning movie management into a generic
 - import one movie into the tenant catalog
 - list imported movies for the tenant
 
+## Module Lifecycle
+
+Recommended first lifecycle for this module:
+
+1. the authenticated user sends a search term
+2. the system queries the external provider through `integrations/`
+3. the user chooses one external movie result
+4. the system imports a normalized snapshot into the tenant catalog
+5. future modules use the internal movie record, not the provider response directly
+
+This keeps the integration boundary clear and avoids leaking provider-specific behavior into the rest of the product.
+
 ## Deferred Scope
 
 - full movie editing flows
@@ -67,6 +79,25 @@ The module should separate:
 
 Future providers can reuse the same service flow as long as they implement the provider contract.
 
+## What Should Not Happen
+
+- sessions must not depend directly on external provider ids
+- reservations and tickets must not fetch movie data from the provider at request time
+- provider payloads should not leak directly into HTTP responses of internal catalog endpoints
+- the module should not become a full editorial CMS for movies unless that becomes necessary later
+
+The internal catalog exists exactly to decouple the cinema workflow from the provider runtime.
+
+## Suggested Route Direction
+
+When HTTP routes are implemented, the first useful shape is:
+
+- `GET /movies/search`: search in external provider
+- `POST /movies/import`: import one provider movie into the tenant catalog
+- `GET /movies`: list movies already imported for the tenant
+
+These routes are enough to support the next steps of the roadmap without overbuilding the module.
+
 ## Planned Use Cases
 
 - `SearchExternalMoviesService`
@@ -74,3 +105,12 @@ Future providers can reuse the same service flow as long as they implement the p
 - `ListMoviesService`
 
 This is enough to unlock the next modules without making the project infinite.
+
+## Next Implementation Steps
+
+- create the Drizzle repository for catalog movies
+- create the first external provider client and mapper
+- expose the initial HTTP routes for search, import, and list
+- add E2E coverage for tenant isolation and import duplication
+
+Anything beyond that should be justified by the next module that depends on `movies`.

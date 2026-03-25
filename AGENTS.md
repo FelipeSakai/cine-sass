@@ -116,6 +116,8 @@ Hoje o sistema e uma API backend de processo unico, com um unico modulo de negoc
 
 O modulo `movies` ainda nao esta implementado funcionalmente, mas ja tem scaffold arquitetural, contratos iniciais e spec propria para orientar a proxima fase.
 
+A estrategia definida para `movies` e trata-lo como catalogo interno do tenant alimentado por provider externo, evitando tanto CRUD manual completo quanto dependencia direta da API externa nos modulos futuros.
+
 ### Foundation pronta
 
 Ja existe:
