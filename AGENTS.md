@@ -105,9 +105,16 @@ Padrao canonico de modulo em `src/modules/<modulo>`:
 
 Observacao: `iam` passa a ser a referencia pratica desse padrao, e `movies` fica como scaffold alinhado para os proximos modulos.
 
+Specs importantes hoje:
+
+- `specs/system-architecture.md`: padrao canonico de estrutura modular
+- `specs/movies-module.md`: estrategia do modulo `movies` como catalogo interno alimentado por provider externo
+
 ## Estado real da implementacao
 
 Hoje o sistema e uma API backend de processo unico, com um unico modulo de negocio relevante: IAM.
+
+O modulo `movies` ainda nao esta implementado funcionalmente, mas ja tem scaffold arquitetural, contratos iniciais e spec propria para orientar a proxima fase.
 
 ### Foundation pronta
 
