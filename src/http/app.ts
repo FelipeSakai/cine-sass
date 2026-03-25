@@ -5,8 +5,8 @@ import { errorHandler } from "src/shared/errors/error-handler";
 import { loggerOptions } from "src/shared/logger";
 import { env } from "src/shared/env";
 
-import { registerIamRoutes } from "src/modules/iam/http/iam.routes";
-import { registerAuthRoutes } from "src/modules/iam/http/auth.routes";
+import { registerIamRoutes } from "src/modules/iam/http/routes/iam.routes";
+import { registerAuthRoutes } from "src/modules/iam/http/routes/auth.routes";
 
 export async function buildApp() {
   const app = fastify({

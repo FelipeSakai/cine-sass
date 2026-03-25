@@ -1,5 +1,5 @@
 import { db } from "src/shared/db/client";
-import { TenantInsert, TenantsRepository, type DbExecutor } from "../iam.repositories";
+import { TenantInsert, TenantsRepository, type DbExecutor } from "../contracts";
 import { tenants } from "src/shared/db/schema";
 import { eq } from "drizzle-orm";
 import { randomUUID } from "crypto";

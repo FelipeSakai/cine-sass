@@ -3,7 +3,7 @@ import {
   UserInsert,
   UsersRepository,
   type DbExecutor,
-} from "../iam.repositories";
+} from "../contracts";
 import { users } from "src/shared/db/schema";
 import { eq } from "drizzle-orm";
 import { randomUUID } from "crypto";

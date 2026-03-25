@@ -1,9 +1,9 @@
 import { db } from "src/shared/db/client";
-import { DbExecutor } from "../iam.repositories";
+import { DbExecutor } from "../contracts";
 import {
   RefreshTokensCreateData,
   RefreshTokensRepository,
-} from "../refresh-tokens.repository";
+} from "../refresh-tokens.contract";
 import { refreshTokens } from "src/shared/db/schema";
 import { eq } from "drizzle-orm";
 import { randomUUID } from "crypto";

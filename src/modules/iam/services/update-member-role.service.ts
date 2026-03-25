@@ -1,5 +1,5 @@
 import { Role } from "../domain/role";
-import type { MembershipsRepository } from "../repositories/iam.repositories";
+import type { MembershipsRepository } from "../repositories/contracts";
 
 type Result = { ok: true } | { ok: false; status: 403 | 404; message: string };
 

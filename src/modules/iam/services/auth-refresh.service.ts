@@ -1,6 +1,6 @@
 import { ApiError } from "src/shared/errors/api-error";
-import type { DbExecutor, UsersRepository } from "../repositories/iam.repositories";
-import type { RefreshTokensRepository } from "../repositories/refresh-tokens.repository";
+import type { DbExecutor, UsersRepository } from "../repositories/contracts";
+import type { RefreshTokensRepository } from "../repositories/refresh-tokens.contract";
 import crypto from "node:crypto";
 import { RefreshInput, RefreshOutput } from "../dtos/auth-refresh.dto";
 

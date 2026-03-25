@@ -1,6 +1,6 @@
 import crypto from "node:crypto";
 import { LogoutInput } from "../dtos/auth-logout.dto";
-import { RefreshTokensRepository } from "../repositories/refresh-tokens.repository";
+import { RefreshTokensRepository } from "../repositories/refresh-tokens.contract";
 
 export default class AuthLogoutService {
   constructor(private refreshTokensRepo: RefreshTokensRepository) {}

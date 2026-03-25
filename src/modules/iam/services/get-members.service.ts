@@ -1,4 +1,4 @@
-import { MembershipsRepository } from "../repositories/iam.repositories";
+import { MembershipsRepository } from "../repositories/contracts";
 
 export class GetMembersService {
   constructor(private membershipRepo: MembershipsRepository) {}

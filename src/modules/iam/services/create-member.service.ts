@@ -8,7 +8,7 @@ import {
   DbExecutor,
   MembershipsRepository,
   UsersRepository,
-} from "../repositories/iam.repositories";
+} from "../repositories/contracts";
 import bcrypt from "bcryptjs";
 
 export class CreateMemberService {

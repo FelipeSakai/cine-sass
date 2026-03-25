@@ -6,7 +6,7 @@ Este arquivo e a memoria operacional do projeto para futuras IAs e mantenedores.
 
 Ele deve ser tratado como um documento vivo. Sempre que houver mudanca relevante de arquitetura, fluxo de negocio, stack, modulos, decisoes tecnicas, convencoes ou status do roadmap, atualize este arquivo no mesmo trabalho.
 
-Contexto importante: este e um projeto de estudos, mas com intencao de simular um backend SaaS de nivel profissional. Entao as decisoes devem equilibrar aprendizado, clareza arquitetural e praticas proximas de producao.
+Contexto importante: este e um projeto de estudos, mas com intencao de simular um backend SaaS de nivel profissional. Entao as decisoes devem equilibrar aprendizado, clareza arquitetural, uso profissional das tecnologias e praticas proximas de producao.
 
 ## Resumo rapido
 
@@ -21,6 +21,7 @@ Contexto importante: este e um projeto de estudos, mas com intencao de simular u
 
 O projeto nao e so para "funcionar". Ele existe para estudar e demonstrar:
 
+- tecnologias novas aplicadas em um sistema coerente
 - arquitetura backend organizada
 - separacao de responsabilidades
 - multi-tenancy real via `tenant_id`
@@ -30,6 +31,25 @@ O projeto nao e so para "funcionar". Ele existe para estudar e demonstrar:
 - evolucao incremental por modulos
 
 Este repositorio deve continuar parecendo um laboratorio serio de backend, e nao um CRUD generico.
+
+## Filosofia de evolucao
+
+O foco real deste projeto e aprender tecnologias novas e aplica-las dentro de um sistema com cara de produto real.
+
+Isso significa:
+
+- buscar um nivel profissional de organizacao e decisao tecnica
+- evitar endurecimento excessivo antes da hora
+- aceitar consolidacao parcial quando ela ja sustenta o proximo aprendizado
+- priorizar modulos que ensinem habilidades novas em vez de polir indefinidamente o que ja funciona
+- manter o roadmap finito e com escopo controlado
+
+Regra pratica para futuras IAs e mantenedores:
+
+- cada fase deve ficar boa o bastante para sustentar a proxima
+- nem toda fase precisa ficar exaustiva em nivel de producao real antes do projeto avancar
+- quando houver trade-off entre perfeccionismo e aprendizado novo, priorizar o aprendizado sem perder coerencia arquitetural
+- evitar adicionar tecnologias novas que empurrem o projeto para complexidade desproporcional ou infinita
 
 ## Stack atual
 
@@ -47,6 +67,7 @@ Este repositorio deve continuar parecendo um laboratorio serio de backend, e nao
 Arquivos-base importantes:
 
 - `package.json`
+- `specs/system-architecture.md`
 - `src/http/app.ts`
 - `src/http/server.ts`
 - `src/shared/env/index.ts`
@@ -65,16 +86,24 @@ Organizacao principal:
 
 - `src/http`: bootstrap da aplicacao
 - `src/shared`: infraestrutura e concerns compartilhados (`db`, `env`, `errors`, `logger`)
-- `src/modules/iam`: modulo de negocio atualmente implementado
+- `src/modules`: modulos de dominio seguindo um padrao canonico
+- `specs/`: especificacoes vivas de arquitetura e decisoes transversais do sistema
 
-Dentro de `src/modules/iam`:
+Padrao canonico de modulo em `src/modules/<modulo>`:
 
-- `http/`: rotas, controllers, middlewares, testes E2E do modulo
-- `services/`: casos de uso e regras de negocio
-- `repositories/`: contratos e implementacoes Drizzle
-- `factories/`: composicao manual das dependencias
-- `domain/`: enums e conceitos centrais do dominio
+- `domain/`: enums, value objects e conceitos centrais do dominio
 - `dtos/`: contratos de entrada e saida
+- `factories/`: composicao manual das dependencias
+- `http/controllers/`: adaptacao HTTP fina
+- `http/middlewares/`: guards e contexto HTTP
+- `http/routes/`: registro de rotas Fastify
+- `http/tests/`: testes E2E do modulo
+- `integrations/`: clients, mappers e providers externos quando existirem
+- `services/`: casos de uso e regras de negocio
+- `repositories/contracts.ts`: contratos e tipos compartilhados de persistencia
+- `repositories/drizzle/`: implementacoes Drizzle
+
+Observacao: `iam` passa a ser a referencia pratica desse padrao, e `movies` fica como scaffold alinhado para os proximos modulos.
 
 ## Estado real da implementacao
 
@@ -183,6 +212,9 @@ Observacao importante: o contexto multi-tenant atual e explicito e simples. Isso
 - Regras de negocio devem ir para `services`
 - Acesso ao banco deve passar por repositories sempre que fizer sentido
 - Factories sao o mecanismo atual de injecao de dependencia
+- Arquivos de rota devem ficar apenas em `http/routes/`
+- Contratos de repositorio devem ficar em `repositories/contracts.ts` ou arquivos `*.contract.ts` no mesmo nivel
+- Integracoes externas devem ficar em `integrations/`, nunca misturadas com `http/` ou `services/`
 - Nomes de arquivos TypeScript do dominio devem usar kebab-case com sufixos explicitos, por exemplo `update-member-role.controller.ts`, `auth-refresh.service.ts` e `make-auth-login-service.factory.ts`
 - Artefatos de build em `dist/` nao devem ser versionados; gerar localmente via `npm run build`
 - Operacoes criticas devem preferir transacoes explicitas
@@ -230,15 +262,19 @@ Fases definidas hoje:
 1. IAM / Auth
 2. Multi-tenant & RBAC
 3. Catalogo interno
-4. Integracao externa de catalogo
-5. Assentos e mapa da sessao
-6. Reserva com concorrencia
-7. Pedidos e checkout
-8. Tickets e check-in
-9. Observabilidade
-10. Cache & performance
-11. IA aplicada ao SaaS
-12. CI/CD & deploy
+4.5. Contratos de API e documentacao viva
+5. Integracao externa de catalogo
+6. Assentos e mapa da sessao
+7. Reserva com concorrencia
+8. Pedidos e checkout
+8.5. Auditoria e eventos de dominio
+9. Filas e jobs assincronos
+10. Tickets e check-in
+11. Observabilidade
+12. Cache & performance
+12.5. Storage e arquivos
+13. IA aplicada ao SaaS
+14. CI/CD & deploy
 
 Leitura honesta do estado atual:
 
@@ -255,7 +291,7 @@ Estas observacoes sao importantes para futuras IAs nao assumirem coisas erradas:
 - `.env.example` ja foi alinhado com `DATABASE_URL_TEST`, mas futuras mudancas de env devem atualizar exemplo e documentacao juntos
 - o script `start` ja foi alinhado ao output atual do build; se a estrutura de compilacao mudar, revisar `package.json`
 - havia um BOM em `tsconfig.json` que quebrava o `tsc-alias`; isso foi corrigido e deve ser evitado em edicoes futuras
-- existe pequena inconsistência de desenho interno: nem todos os services seguem o mesmo nivel de desacoplamento dos repositories/factories, por exemplo `createMember.service.ts` usa `db` global e `getMe.service.ts` depende de implementacao concreta
+- existe pequena inconsistencia de desenho interno: nem todos os services seguem o mesmo nivel de desacoplamento dos repositories/factories, por exemplo `createMember.service.ts` usa `db` global e `getMe.service.ts` depende de implementacao concreta
 
 ## Decisoes arquiteturais para preservar
 
@@ -277,6 +313,9 @@ Nao assumir como implementado, a menos que o codigo mude:
 - reservas concorrentes
 - pedidos e checkout
 - tickets e check-in
+- filas e jobs assincronos em producao
+- documentacao OpenAPI consistente
+- storage de arquivos em producao
 - Redis ativo
 - pgvector ativo
 - observabilidade completa
@@ -291,6 +330,7 @@ Sempre atualizar este `AGENTS.md` quando houver pelo menos um destes eventos:
 - novo modulo iniciado ou concluido
 - mudanca de arquitetura ou convencao relevante
 - nova dependencia estrutural importante
+- criacao ou revisao relevante de specs em `specs/`
 - novo fluxo de autenticacao/autorizacao
 - mudanca de estrategia de testes
 - alteracao relevante no roadmap real

@@ -5,7 +5,7 @@ import {
   MembershipsRepository,
   MembershipSummary,
   type DbExecutor,
-} from "../iam.repositories";
+} from "../contracts";
 import { memberships, users } from "src/shared/db/schema";
 import { and, eq } from "drizzle-orm";
 import { randomUUID } from "crypto";

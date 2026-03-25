@@ -1,4 +1,4 @@
-import { DbExecutor } from "./iam.repositories";
+import { DbExecutor } from "./contracts";
 
 export type RefreshTokensCreateData = {
   userId: string;

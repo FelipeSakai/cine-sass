@@ -4,8 +4,8 @@ import {
   DbExecutor,
   MembershipsRepository,
   UsersRepository,
-} from "../repositories/iam.repositories";
-import { RefreshTokensRepository } from "../repositories/refresh-tokens.repository";
+} from "../repositories/contracts";
+import { RefreshTokensRepository } from "../repositories/refresh-tokens.contract";
 import bcrypt from "bcryptjs";
 import crypto from "node:crypto";
 

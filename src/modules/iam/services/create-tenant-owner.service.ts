@@ -3,7 +3,7 @@ import type {
   MembershipsRepository,
   TenantsRepository,
   UsersRepository,
-} from "../repositories/iam.repositories";
+} from "../repositories/contracts";
 import type {
   CreateTenantOwnerInput,
   CreateTenantOwnerOutput,
