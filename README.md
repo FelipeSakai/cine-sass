@@ -90,7 +90,7 @@ Principios que guiam o projeto:
 
 ## Estado atual da implementacao
 
-Hoje o projeto e uma API backend de processo unico, com foundation pronta e modulo IAM/Auth bem avancado.
+Hoje o projeto e uma API backend de processo unico, com foundation pronta, modulo IAM/Auth bem avancado e primeira entrega funcional do modulo `movies`.
 
 ### Foundation pronta
 
@@ -122,11 +122,20 @@ Ja existe implementacao para:
 - criacao de membros do tenant
 - listagem de membros do tenant
 
+### Movies implementado no escopo inicial
+
+Ja existe implementacao para:
+
+- busca de filmes em provider externo via `GET /movies/search`
+- importacao de snapshot do TMDB para o catalogo interno do tenant via `POST /movies/import`
+- listagem de filmes importados do tenant via `GET /movies`
+- isolamento por tenant no catalogo interno
+- prevencao de importacao duplicada por `(tenant_id, source_provider, source_movie_id)`
+
 ### O que ainda nao existe
 
 Ainda nao ha implementacao real para:
 
-- catalogo de filmes
 - salas e sessoes como modulo de produto
 - mapa de assentos
 - reserva concorrente
@@ -157,6 +166,9 @@ Ainda nao ha implementacao real para:
 - `GET /protected/admin-ping`
 - `POST /members`
 - `GET /members`
+- `GET /movies/search`
+- `POST /movies/import`
+- `GET /movies`
 
 ---
 
@@ -179,7 +191,7 @@ Essa abordagem atual prioriza clareza e simplicidade arquitetural, o que combina
 
 ## Modelo de dados atual
 
-O schema principal implementado ate agora e `iam`.
+Os schemas principais implementados ate agora sao `iam` e `catalog`.
 
 Tabelas atuais:
 
@@ -187,6 +199,7 @@ Tabelas atuais:
 - `iam.users`
 - `iam.memberships`
 - `iam.refresh_tokens`
+- `catalog.movies`
 
 Relacoes importantes:
 
@@ -221,6 +234,7 @@ Cobertura relevante hoje:
 - middlewares de auth e tenant
 - endpoint `/me`
 - cenario basico de RBAC
+- fluxo inicial de `movies` com busca, importacao sem duplicidade e isolamento por tenant
 
 Lacunas atuais:
 
@@ -248,11 +262,11 @@ Status: parcial
 
 ### Fase 3 - Catalogo interno
 
-Status: planejado
+Status: em andamento
 
 ### Fase 4 - Integracao externa de catalogo
 
-Status: planejado
+Status: em andamento
 
 ### Fase 5 - Assentos e mapa da sessao
 
@@ -313,6 +327,8 @@ Preencha o `.env` com os valores necessarios, no minimo:
 NODE_ENV=development
 PORT=3333
 DATABASE_URL=postgres://postgres:postgres@localhost:5433/cinesaas
+DATABASE_URL_TEST=postgres://postgres:postgres@localhost:5433/cinesaas_test
+TMDB_API_KEY=sua_chave_tmdb_opcional_para_rotas_de_movies
 JWT_SECRET=uma_chave_com_pelo_menos_32_caracteres
 JWT_ACCESS_TTL=15m
 ```

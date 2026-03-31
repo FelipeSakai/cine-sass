@@ -13,8 +13,8 @@ Contexto importante: este e um projeto de estudos, mas com intencao de simular u
 - Nome: `CineSaaS`
 - Tipo: backend SaaS multi-tenant para cinemas
 - Foco principal: estudos avancados de arquitetura backend, auth, multi-tenant, concorrencia, observabilidade e IA aplicada
-- Estagio atual: fundacao pronta e modulo IAM/Auth ja bem adiantado
-- Dominio implementado hoje: `iam`
+- Estagio atual: fundacao pronta, IAM/Auth avancado e modulo `movies` com primeira entrega funcional
+- Dominio implementado hoje: `iam` e escopo inicial de `movies`
 - Estilo arquitetural: modular, orientado a dominio, com controllers finos e regras nos services
 
 ## Intencao do projeto
@@ -103,7 +103,7 @@ Padrao canonico de modulo em `src/modules/<modulo>`:
 - `repositories/contracts.ts`: contratos e tipos compartilhados de persistencia
 - `repositories/drizzle/`: implementacoes Drizzle
 
-Observacao: `iam` passa a ser a referencia pratica desse padrao, e `movies` fica como scaffold alinhado para os proximos modulos.
+Observacao: `iam` continua sendo a referencia pratica principal desse padrao, e `movies` agora tambem ja tem implementacao funcional inicial com provider externo + catalogo interno.
 
 Specs importantes hoje:
 
@@ -112,9 +112,9 @@ Specs importantes hoje:
 
 ## Estado real da implementacao
 
-Hoje o sistema e uma API backend de processo unico, com um unico modulo de negocio relevante: IAM.
+Hoje o sistema e uma API backend de processo unico, com IAM maduro para a fase atual e o primeiro modulo de produto inicializado de forma funcional: `movies`.
 
-O modulo `movies` ainda nao esta implementado funcionalmente, mas ja tem scaffold arquitetural, contratos iniciais e spec propria para orientar a proxima fase.
+O modulo `movies` ja implementa busca em provider externo, importacao para catalogo interno por tenant e listagem de filmes importados, mantendo o contrato arquitetural do projeto.
 
 A estrategia definida para `movies` e trata-lo como catalogo interno do tenant alimentado por provider externo, evitando tanto CRUD manual completo quanto dependencia direta da API externa nos modulos futuros.
 
@@ -149,6 +149,16 @@ Ja existe implementacao para:
 - remocao de membro do tenant por exclusao de membership
 - endpoints de teste/protecao para auth, tenant e role
 
+### Movies implementado no escopo inicial
+
+Ja existe implementacao para:
+
+- `GET /movies/search` consultando provider externo normalizado
+- `POST /movies/import` importando snapshot do TMDB para `catalog.movies`
+- `GET /movies` listando o catalogo interno do tenant
+- deduplicacao por tenant ao reimportar o mesmo `source_movie_id`
+- provider TMDB encapsulado em `integrations/providers/`
+
 ### Rotas atuais
 
 Rotas publicas:
@@ -168,10 +178,13 @@ Rotas protegidas:
 - `POST /members`
 - `GET /members`
 - `DELETE /members/:userId`
+- `GET /movies/search`
+- `POST /movies/import`
+- `GET /movies`
 
 ## Modelo de dados atual
 
-Schema principal implementado: `iam`
+Schemas com implementacao iniciada: `iam` e `catalog`
 
 Tabelas atuais:
 
@@ -179,6 +192,7 @@ Tabelas atuais:
 - `iam.users`
 - `iam.memberships`
 - `iam.refresh_tokens`
+- `catalog.movies`
 
 Relacoes principais:
 
@@ -193,6 +207,7 @@ Garantias importantes ja presentes:
 - email de usuario unico
 - combinacao `(tenant_id, user_id)` unica em memberships
 - hash de refresh token unico
+- combinacao `(tenant_id, source_provider, source_movie_id)` unica em `catalog.movies`
 - cascata em remocoes relacionadas
 
 Roles atuais:
@@ -236,7 +251,7 @@ Estrategia atual:
 
 - foco principal em testes E2E
 - uso de banco real
-- limpeza das tabelas IAM a cada teste via `TRUNCATE`
+- limpeza das tabelas IAM a cada teste via `TRUNCATE` com cascata para `catalog.movies`
 - execucao sem paralelismo para evitar interferencia entre cenarios
 
 Cobertura atual relevante:
@@ -249,6 +264,7 @@ Cobertura atual relevante:
 - caso basico de RBAC
 - update de role de membro
 - remocao de membro
+- fluxo inicial de `movies` com busca, importacao duplicada e isolamento por tenant
 
 Lacunas percebidas hoje:
 
@@ -290,7 +306,8 @@ Leitura honesta do estado atual:
 - modulo 0 esta concluido
 - modulo 1 esta bem mais avancado do que o README sugere
 - parte do modulo 2 ja comecou na pratica (tenant context + roles + membership checks)
-- os modulos de produto do cinema ainda nao comecaram
+- modulo 3 ja comecou funcionalmente com catalogo interno inicial
+- a integracao externa inicial com TMDB tambem ja comecou na pratica
 
 ## Inconsistencias atuais entre docs e codigo
 
@@ -301,6 +318,7 @@ Estas observacoes sao importantes para futuras IAs nao assumirem coisas erradas:
 - o script `start` ja foi alinhado ao output atual do build; se a estrutura de compilacao mudar, revisar `package.json`
 - havia um BOM em `tsconfig.json` que quebrava o `tsc-alias`; isso foi corrigido e deve ser evitado em edicoes futuras
 - existe pequena inconsistencia de desenho interno: nem todos os services seguem o mesmo nivel de desacoplamento dos repositories/factories, por exemplo `createMember.service.ts` usa `db` global e `getMe.service.ts` depende de implementacao concreta
+- `drizzle.config.ts` agora resolve corretamente `DATABASE_URL_TEST` em ambiente de teste; futuras mudancas de env devem preservar esse comportamento para migrations locais
 
 ## Decisoes arquiteturais para preservar
 
@@ -317,7 +335,7 @@ Se uma futura IA tocar neste projeto, deve preservar salvo instrucao contraria:
 
 Nao assumir como implementado, a menos que o codigo mude:
 
-- catalogo de filmes, salas ou sessoes
+- salas ou sessoes
 - mapa de assentos
 - reservas concorrentes
 - pedidos e checkout
@@ -364,4 +382,4 @@ Quando houver conflito entre narrativa e implementacao:
 
 ## Ultima leitura consolidada
 
-Baseado no estado atual do repositorio em `Mon Mar 23 2026`, ja considerando a revisao do roadmap para um fluxo de estudo mais realista.
+Baseado no estado atual do repositorio em `Mon Mar 30 2026`, ja considerando a entrega funcional inicial do modulo `movies`.
