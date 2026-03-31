@@ -14,6 +14,10 @@ export class ImportMovieService {
   ) {}
 
   async execute(input: ImportMovieInput): Promise<ImportMovieOutput> {
+    if (input.sourceProvider !== this.externalCatalogProvider.provider) {
+      throw new ApiError("Unsupported movie provider", 400);
+    }
+
     const existing = await this.catalogMoviesRepo.findByTenantAndSourceRef(
       input.tenantId,
       input.sourceProvider,

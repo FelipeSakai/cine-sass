@@ -1,3 +1,5 @@
+import { ApiError } from "src/shared/errors/api-error";
+
 import type {
   SearchExternalMoviesInput,
   SearchExternalMoviesOutput,
@@ -10,6 +12,10 @@ export class SearchExternalMoviesService {
   async execute(
     input: SearchExternalMoviesInput,
   ): Promise<SearchExternalMoviesOutput> {
+    if (input.provider && input.provider !== this.externalCatalogProvider.provider) {
+      throw new ApiError("Unsupported movie provider", 400);
+    }
+
     return this.externalCatalogProvider.searchMovies(input);
   }
 }

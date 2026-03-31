@@ -13,6 +13,7 @@ export type ListMoviesOutputItem = {
   posterUrl: string | null;
   backdropUrl: string | null;
   releaseDate: string | null;
+  runtimeMinutes: number | null;
   sourceProvider: MovieSourceProvider;
   sourceMovieId: string;
   importedAt: Date;

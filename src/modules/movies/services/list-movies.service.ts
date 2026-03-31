@@ -19,6 +19,7 @@ export class ListMoviesService {
       posterUrl: movie.posterUrl,
       backdropUrl: movie.backdropUrl,
       releaseDate: movie.releaseDate,
+      runtimeMinutes: movie.runtimeMinutes,
       sourceProvider: movie.sourceProvider,
       sourceMovieId: movie.sourceMovieId,
       importedAt: movie.importedAt,

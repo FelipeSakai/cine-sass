@@ -22,6 +22,13 @@
       "when": 1770334401305,
       "tag": "0002_open_otto_octavius",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1774653022022,
+      "tag": "0003_wise_landau",
+      "breakpoints": true
     }
   ]
 }

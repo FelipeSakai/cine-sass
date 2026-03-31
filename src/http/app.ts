@@ -7,6 +7,7 @@ import { env } from "src/shared/env";
 
 import { registerIamRoutes } from "src/modules/iam/http/routes/iam.routes";
 import { registerAuthRoutes } from "src/modules/iam/http/routes/auth.routes";
+import { registerMoviesRoutes } from "src/modules/movies/http/routes/movies.routes";
 
 export async function buildApp() {
   const app = fastify({
@@ -26,6 +27,7 @@ export async function buildApp() {
 
   await registerIamRoutes(app);
   await registerAuthRoutes(app);
+  await registerMoviesRoutes(app);
 
   return app;
 }

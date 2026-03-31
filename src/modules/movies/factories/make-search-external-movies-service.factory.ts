@@ -1,8 +1,6 @@
-import type { ExternalMovieCatalogProvider } from "../integrations/providers/external-movie-catalog.provider";
+import { makeExternalMovieCatalogProvider } from "./make-external-movie-catalog-provider.factory";
 import { SearchExternalMoviesService } from "../services/search-external-movies.service";
 
-export function makeSearchExternalMoviesService(
-  externalCatalogProvider: ExternalMovieCatalogProvider,
-) {
-  return new SearchExternalMoviesService(externalCatalogProvider);
+export function makeSearchExternalMoviesService() {
+  return new SearchExternalMoviesService(makeExternalMovieCatalogProvider());
 }
