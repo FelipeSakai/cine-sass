@@ -13,8 +13,8 @@ Contexto importante: este e um projeto de estudos, mas com intencao de simular u
 - Nome: `CineSaaS`
 - Tipo: backend SaaS multi-tenant para cinemas
 - Foco principal: estudos avancados de arquitetura backend, auth, multi-tenant, concorrencia, observabilidade e IA aplicada
-- Estagio atual: fundacao pronta, IAM/Auth avancado e modulo `movies` com primeira entrega funcional
-- Dominio implementado hoje: `iam` e escopo inicial de `movies`
+- Estagio atual: fundacao pronta, IAM/Auth avancado, modulo `movies` funcional e modulo `rooms` com primeira entrega operacional
+- Dominio implementado hoje: `iam`, `movies` e escopo inicial de `rooms`
 - Estilo arquitetural: modular, orientado a dominio, com controllers finos e regras nos services
 
 ## Intencao do projeto
@@ -50,6 +50,12 @@ Regra pratica para futuras IAs e mantenedores:
 - nem toda fase precisa ficar exaustiva em nivel de producao real antes do projeto avancar
 - quando houver trade-off entre perfeccionismo e aprendizado novo, priorizar o aprendizado sem perder coerencia arquitetural
 - evitar adicionar tecnologias novas que empurrem o projeto para complexidade desproporcional ou infinita
+
+Diretriz pratica no estado atual do projeto:
+
+- o modulo `movies` esta considerado consolidado o bastante para os objetivos de estudo atuais
+- evitar gastar ciclos excessivos em polimento incremental de `movies` se isso nao destravar aprendizado novo
+- os proximos estudos devem priorizar a cadeia operacional do cinema: salas, sessoes, mapa de assentos e reservas
 
 ## Stack atual
 
@@ -109,14 +115,17 @@ Specs importantes hoje:
 
 - `specs/system-architecture.md`: padrao canonico de estrutura modular
 - `specs/movies-module.md`: estrategia do modulo `movies` como catalogo interno alimentado por provider externo
+- `specs/rooms-and-sessions-module.md`: direcao de planejamento para os proximos modulos operacionais de salas e sessoes
 
 ## Estado real da implementacao
 
-Hoje o sistema e uma API backend de processo unico, com IAM maduro para a fase atual e o primeiro modulo de produto inicializado de forma funcional: `movies`.
+Hoje o sistema e uma API backend de processo unico, com IAM maduro para a fase atual, `movies` funcional como catalogo interno e `rooms` iniciado como base operacional de salas.
 
 O modulo `movies` ja implementa busca em provider externo, importacao para catalogo interno por tenant e listagem de filmes importados, mantendo o contrato arquitetural do projeto.
 
 A estrategia definida para `movies` e trata-lo como catalogo interno do tenant alimentado por provider externo, evitando tanto CRUD manual completo quanto dependencia direta da API externa nos modulos futuros.
+
+O modulo `rooms` agora fornece cadastro e consulta de salas por tenant, com layout de assentos persistido em JSON e `seat_count` derivado do layout ativo.
 
 ### Foundation pronta
 
@@ -159,6 +168,18 @@ Ja existe implementacao para:
 - deduplicacao por tenant ao reimportar o mesmo `source_movie_id`
 - provider TMDB encapsulado em `integrations/providers/`
 
+### Rooms implementado no escopo inicial
+
+Ja existe implementacao para:
+
+- `POST /rooms` criando sala do tenant com `seat_layout` JSON
+- `GET /rooms` listando salas do tenant
+- `GET /rooms/:roomId` buscando sala do tenant por id
+- `PATCH /rooms/:roomId` atualizando nome e layout da sala
+- validacao de layout com fileiras unicas, assentos unicos por fileira e pelo menos um assento ativo
+- `seat_count` persistido a partir da contagem de assentos ativos
+- RBAC de escrita permitindo `OWNER`, `ADMIN` e `STAFF`
+
 ### Rotas atuais
 
 Rotas publicas:
@@ -181,6 +202,10 @@ Rotas protegidas:
 - `GET /movies/search`
 - `POST /movies/import`
 - `GET /movies`
+- `POST /rooms`
+- `GET /rooms`
+- `GET /rooms/:roomId`
+- `PATCH /rooms/:roomId`
 
 ## Modelo de dados atual
 
@@ -193,6 +218,7 @@ Tabelas atuais:
 - `iam.memberships`
 - `iam.refresh_tokens`
 - `catalog.movies`
+- `catalog.rooms`
 
 Relacoes principais:
 
@@ -265,6 +291,7 @@ Cobertura atual relevante:
 - update de role de membro
 - remocao de membro
 - fluxo inicial de `movies` com busca, importacao duplicada e isolamento por tenant
+- fluxo inicial de `rooms` com criacao por `STAFF`, validacao de layout, patch e isolamento por tenant
 
 Lacunas percebidas hoje:
 
@@ -307,7 +334,10 @@ Leitura honesta do estado atual:
 - modulo 1 esta bem mais avancado do que o README sugere
 - parte do modulo 2 ja comecou na pratica (tenant context + roles + membership checks)
 - modulo 3 ja comecou funcionalmente com catalogo interno inicial
+- `rooms` ja iniciou a cadeia operacional do cinema, mas `sessions` e reservas ainda nao existem
 - a integracao externa inicial com TMDB tambem ja comecou na pratica
+- para fins de roadmap de estudo, `movies` nao precisa de consolidacao extensa antes de o projeto avancar para `rooms`/salas e `sessions`
+- o proximo passo planejado agora e implementar `sessions`, aproveitando o spec de `rooms` e `sessions` para agenda por sala, snapshot de layout e prevencao de conflito de horario
 
 ## Inconsistencias atuais entre docs e codigo
 
@@ -335,7 +365,7 @@ Se uma futura IA tocar neste projeto, deve preservar salvo instrucao contraria:
 
 Nao assumir como implementado, a menos que o codigo mude:
 
-- salas ou sessoes
+- sessoes
 - mapa de assentos
 - reservas concorrentes
 - pedidos e checkout

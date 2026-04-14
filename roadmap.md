@@ -241,7 +241,7 @@ Isolamento real entre tenants, autorizacao por contexto e modelagem SaaS.
 
 ## Fase 3 - Catalogo interno
 
-Status: planejado
+Status: em andamento
 
 ### Objetivo de estudo
 
@@ -265,13 +265,19 @@ Modelagem de entidades de negocio, relacionamentos e CRUD com regras reais.
 ### Entrega alvo
 
 - primeiro modulo de produto real do cinema funcionando
-- listagem de sessoes por dia e tenant
+- base pronta para os proximos modulos operacionais
+
+### Leitura atual
+
+- `movies` ja cobre a parte inicial do catalogo interno orientado por tenant
+- nao e necessario polir exaustivamente esta fase antes de avancar
+- a prioridade de estudo depois daqui deve migrar para salas e sessoes
 
 ---
 
 ## Fase 4 - Integracao externa de catalogo
 
-Status: planejado
+Status: em andamento
 
 ### Objetivo de estudo
 
@@ -294,6 +300,11 @@ Integracao com servico externo, resiliencia e fronteira entre sistema interno e 
 ### Entrega alvo
 
 - importacao de filmes externos para o tenant
+
+### Leitura atual
+
+- a integracao inicial com TMDB ja existe com busca externa e importacao para catalogo interno
+- refinamentos adicionais aqui sao secundarios diante dos proximos estudos de dominio
 
 ---
 
