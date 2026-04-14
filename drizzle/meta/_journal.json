@@ -29,6 +29,13 @@
       "when": 1774653022022,
       "tag": "0003_wise_landau",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1776123979667,
+      "tag": "0004_safe_star_brand",
+      "breakpoints": true
     }
   ]
 }
