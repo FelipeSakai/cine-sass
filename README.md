@@ -90,7 +90,7 @@ Principios que guiam o projeto:
 
 ## Estado atual da implementacao
 
-Hoje o projeto e uma API backend de processo unico, com foundation pronta, modulo IAM/Auth bem avancado e primeira entrega funcional do modulo `movies`.
+Hoje o projeto e uma API backend de processo unico, com foundation pronta, modulo IAM/Auth bem avancado, `movies` funcional, `rooms` operacional e primeira entrega funcional de `sessions`.
 
 ### Foundation pronta
 
@@ -132,11 +132,30 @@ Ja existe implementacao para:
 - isolamento por tenant no catalogo interno
 - prevencao de importacao duplicada por `(tenant_id, source_provider, source_movie_id)`
 
+### Rooms implementado no escopo inicial
+
+Ja existe implementacao para:
+
+- cadastro de salas por tenant via `POST /rooms`
+- listagem e busca por id via `GET /rooms` e `GET /rooms/:roomId`
+- atualizacao de nome e layout via `PATCH /rooms/:roomId`
+- `seat_layout` persistido em JSON
+- `seat_count` derivado do layout ativo
+
+### Sessions implementado no escopo inicial
+
+Ja existe implementacao para:
+
+- criacao de sessoes por tenant via `POST /sessions`
+- listagem e busca por id via `GET /sessions` e `GET /sessions/:sessionId`
+- integridade entre `movie`, `room` e tenant ativo
+- persistencia de `room_layout_snapshot` no momento da criacao
+- bloqueio de conflito de horario na mesma sala
+
 ### O que ainda nao existe
 
 Ainda nao ha implementacao real para:
 
-- salas e sessoes como modulo de produto
 - mapa de assentos
 - reserva concorrente
 - pedidos e checkout
@@ -169,6 +188,13 @@ Ainda nao ha implementacao real para:
 - `GET /movies/search`
 - `POST /movies/import`
 - `GET /movies`
+- `POST /rooms`
+- `GET /rooms`
+- `GET /rooms/:roomId`
+- `PATCH /rooms/:roomId`
+- `POST /sessions`
+- `GET /sessions`
+- `GET /sessions/:sessionId`
 
 ---
 
@@ -200,6 +226,8 @@ Tabelas atuais:
 - `iam.memberships`
 - `iam.refresh_tokens`
 - `catalog.movies`
+- `catalog.rooms`
+- `catalog.sessions`
 
 Relacoes importantes:
 
@@ -207,6 +235,7 @@ Relacoes importantes:
 - um user possui varios memberships
 - membership conecta `user` e `tenant` com `role`
 - um user possui varios refresh tokens
+- uma `session` pertence a um `tenant`, um `movie` interno e uma `room`
 
 Roles atuais:
 
@@ -235,6 +264,8 @@ Cobertura relevante hoje:
 - endpoint `/me`
 - cenario basico de RBAC
 - fluxo inicial de `movies` com busca, importacao sem duplicidade e isolamento por tenant
+- fluxo inicial de `rooms` com criacao por `STAFF`, validacao de layout e isolamento por tenant
+- fluxo inicial de `sessions` com criacao por `STAFF`, snapshot de layout, conflito de horario e isolamento por tenant
 
 Lacunas atuais:
 

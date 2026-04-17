@@ -24,6 +24,20 @@ export class DrizzleCatalogMoviesRepository implements CatalogMoviesRepository {
     return created;
   }
 
+  async findByIdAndTenantId(
+    movieId: string,
+    tenantId: string,
+    executor: DbExecutor = db,
+  ): Promise<CatalogMovieRecord | null> {
+    const [movie] = await executor
+      .select()
+      .from(catalogMovies)
+      .where(and(eq(catalogMovies.id, movieId), eq(catalogMovies.tenantId, tenantId)))
+      .limit(1);
+
+    return movie ?? null;
+  }
+
   async findByTenantAndSourceRef(
     tenantId: string,
     sourceProvider: CatalogMovieRecord["sourceProvider"],

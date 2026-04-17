@@ -116,16 +116,19 @@ Specs importantes hoje:
 - `specs/system-architecture.md`: padrao canonico de estrutura modular
 - `specs/movies-module.md`: estrategia do modulo `movies` como catalogo interno alimentado por provider externo
 - `specs/rooms-and-sessions-module.md`: direcao de planejamento para os proximos modulos operacionais de salas e sessoes
+- `specs/sessions-module.md`: spec detalhada da primeira entrega do modulo `sessions`, alinhada ao estado atual de `movies` e `rooms`
 
 ## Estado real da implementacao
 
-Hoje o sistema e uma API backend de processo unico, com IAM maduro para a fase atual, `movies` funcional como catalogo interno e `rooms` iniciado como base operacional de salas.
+Hoje o sistema e uma API backend de processo unico, com IAM maduro para a fase atual, `movies` funcional como catalogo interno, `rooms` operacional e `sessions` com primeira entrega funcional.
 
 O modulo `movies` ja implementa busca em provider externo, importacao para catalogo interno por tenant e listagem de filmes importados, mantendo o contrato arquitetural do projeto.
 
 A estrategia definida para `movies` e trata-lo como catalogo interno do tenant alimentado por provider externo, evitando tanto CRUD manual completo quanto dependencia direta da API externa nos modulos futuros.
 
 O modulo `rooms` agora fornece cadastro e consulta de salas por tenant, com layout de assentos persistido em JSON e `seat_count` derivado do layout ativo.
+
+O modulo `sessions` agora fornece agenda operacional por tenant, vinculando filme interno e sala, persistindo `room_layout_snapshot` e bloqueando conflito de horario na mesma sala.
 
 ### Foundation pronta
 
@@ -180,6 +183,18 @@ Ja existe implementacao para:
 - `seat_count` persistido a partir da contagem de assentos ativos
 - RBAC de escrita permitindo `OWNER`, `ADMIN` e `STAFF`
 
+### Sessions implementado no escopo inicial
+
+Ja existe implementacao para:
+
+- `POST /sessions` criando sessao do tenant com `movie_id`, `room_id`, `starts_at` e `ends_at`
+- `GET /sessions` listando sessoes do tenant
+- `GET /sessions/:sessionId` buscando sessao do tenant por id
+- validacao de integridade por tenant para filme e sala
+- persistencia de `room_layout_snapshot` no momento da criacao
+- bloqueio de sobreposicao entre sessoes `SCHEDULED` na mesma sala
+- RBAC de escrita permitindo `OWNER`, `ADMIN` e `STAFF`
+
 ### Rotas atuais
 
 Rotas publicas:
@@ -206,6 +221,9 @@ Rotas protegidas:
 - `GET /rooms`
 - `GET /rooms/:roomId`
 - `PATCH /rooms/:roomId`
+- `POST /sessions`
+- `GET /sessions`
+- `GET /sessions/:sessionId`
 
 ## Modelo de dados atual
 
@@ -219,6 +237,7 @@ Tabelas atuais:
 - `iam.refresh_tokens`
 - `catalog.movies`
 - `catalog.rooms`
+- `catalog.sessions`
 
 Relacoes principais:
 
@@ -226,6 +245,7 @@ Relacoes principais:
 - um user possui varios memberships
 - membership conecta `user <-> tenant` com `role`
 - um user possui varios refresh tokens
+- uma session pertence a um tenant, um movie interno e uma room
 
 Garantias importantes ja presentes:
 
@@ -292,6 +312,7 @@ Cobertura atual relevante:
 - remocao de membro
 - fluxo inicial de `movies` com busca, importacao duplicada e isolamento por tenant
 - fluxo inicial de `rooms` com criacao por `STAFF`, validacao de layout, patch e isolamento por tenant
+- fluxo inicial de `sessions` com criacao por `STAFF`, snapshot de layout, conflito de horario e isolamento por tenant
 
 Lacunas percebidas hoje:
 
@@ -334,10 +355,12 @@ Leitura honesta do estado atual:
 - modulo 1 esta bem mais avancado do que o README sugere
 - parte do modulo 2 ja comecou na pratica (tenant context + roles + membership checks)
 - modulo 3 ja comecou funcionalmente com catalogo interno inicial
-- `rooms` ja iniciou a cadeia operacional do cinema, mas `sessions` e reservas ainda nao existem
+- `rooms` e `sessions` ja iniciaram a cadeia operacional do cinema, mas mapa de assentos por sessao e reservas ainda nao existem
 - a integracao externa inicial com TMDB tambem ja comecou na pratica
 - para fins de roadmap de estudo, `movies` nao precisa de consolidacao extensa antes de o projeto avancar para `rooms`/salas e `sessions`
-- o proximo passo planejado agora e implementar `sessions`, aproveitando o spec de `rooms` e `sessions` para agenda por sala, snapshot de layout e prevencao de conflito de horario
+- `sessions` agora cobre a primeira agenda operacional por sala, com snapshot de layout e prevencao de conflito de horario
+- o proximo passo planejado agora e implementar mapa de assentos por sessao e depois reservas com concorrencia
+- `specs/sessions-module.md` passa a servir como memoria da primeira entrega do modulo e referencia para sua evolucao
 
 ## Inconsistencias atuais entre docs e codigo
 
@@ -365,7 +388,6 @@ Se uma futura IA tocar neste projeto, deve preservar salvo instrucao contraria:
 
 Nao assumir como implementado, a menos que o codigo mude:
 
-- sessoes
 - mapa de assentos
 - reservas concorrentes
 - pedidos e checkout
@@ -412,4 +434,4 @@ Quando houver conflito entre narrativa e implementacao:
 
 ## Ultima leitura consolidada
 
-Baseado no estado atual do repositorio em `Mon Mar 30 2026`, ja considerando a entrega funcional inicial do modulo `movies`.
+Baseado no estado atual do repositorio em `Thu Apr 16 2026`, ja considerando a entrega funcional inicial dos modulos `rooms` e `sessions`.

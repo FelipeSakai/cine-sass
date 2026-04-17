@@ -11,6 +11,11 @@ export interface CatalogMoviesRepository {
     data: Omit<CatalogMovieInsert, "id" | "createdAt" | "updatedAt" | "importedAt">,
     executor?: DbExecutor,
   ): Promise<{ id: string }>;
+  findByIdAndTenantId(
+    movieId: string,
+    tenantId: string,
+    executor?: DbExecutor,
+  ): Promise<CatalogMovieRecord | null>;
   findByTenantAndSourceRef(
     tenantId: string,
     sourceProvider: CatalogMovieRecord["sourceProvider"],
