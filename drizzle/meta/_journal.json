@@ -43,6 +43,13 @@
       "when": 1776383145991,
       "tag": "0005_spicy_calypso",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1776897490497,
+      "tag": "0006_eminent_mole_man",
+      "breakpoints": true
     }
   ]
 }

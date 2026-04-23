@@ -1,9 +1,12 @@
+import { eq } from "drizzle-orm";
 import type { FastifyInstance } from "fastify";
 import request from "supertest";
 import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from "vitest";
 
 import { buildApp } from "src/http/app";
 import { Role } from "src/modules/iam/domain/role";
+import { db } from "src/shared/db/client";
+import { catalogSessionSeats } from "src/shared/db/schema";
 
 let app: FastifyInstance;
 let originalTmdbApiKey: string | undefined;
@@ -26,6 +29,28 @@ function buildSeatLayout(activeSeatsPerRow = 2) {
           type: "STANDARD" as const,
           active: true,
         })),
+      },
+    ],
+  };
+}
+
+function buildMixedSeatLayout() {
+  return {
+    rows: [
+      {
+        label: "A",
+        seats: [
+          { number: 1, type: "STANDARD" as const, active: true },
+          { number: 2, type: "STANDARD" as const, active: false },
+          { number: 3, type: "STANDARD" as const, active: true },
+        ],
+      },
+      {
+        label: "B",
+        seats: [
+          { number: 1, type: "STANDARD" as const, active: true },
+          { number: 2, type: "STANDARD" as const, active: false },
+        ],
       },
     ],
   };
@@ -171,6 +196,25 @@ async function createRoom(auth: { tenantId: string; accessToken: string }, name 
   return response.body;
 }
 
+async function createRoomWithSeatLayout(
+  auth: { tenantId: string; accessToken: string },
+  seatLayout: ReturnType<typeof buildSeatLayout>,
+  name = "Room 1",
+) {
+  const response = await request(app.server)
+    .post("/rooms")
+    .set("Authorization", `Bearer ${auth.accessToken}`)
+    .set("x-tenant-id", auth.tenantId)
+    .send({
+      name,
+      seatLayout,
+    });
+
+  expect(response.status).toBe(201);
+
+  return response.body;
+}
+
 describe("sessions routes", () => {
   beforeAll(async () => {
     originalTmdbApiKey = process.env.TMDB_API_KEY;
@@ -231,6 +275,87 @@ describe("sessions routes", () => {
       status: "SCHEDULED",
     });
     expect(response.body.roomLayoutSnapshot).toEqual(room.seatLayout);
+
+    const sessionSeats = await db
+      .select()
+      .from(catalogSessionSeats)
+      .where(eq(catalogSessionSeats.sessionId, response.body.id));
+
+    expect(sessionSeats).toHaveLength(4);
+    expect(sessionSeats.map((seat) => seat.seatKey)).toEqual(["A-1", "A-2", "B-1", "B-2"]);
+    expect(new Set(sessionSeats.map((seat) => seat.status))).toEqual(new Set(["AVAILABLE"]));
+  });
+
+  it("should materialize only active seats from the room snapshot", async () => {
+    mockMovieCatalog();
+
+    const owner = await createTenantAndLoginOwner("sessions-seat-materialization");
+    const room = await createRoomWithSeatLayout(
+      owner,
+      buildMixedSeatLayout(),
+      "Mixed Layout Room",
+    );
+    const movieId = await importMovie(owner);
+
+    const response = await request(app.server)
+      .post("/sessions")
+      .set("Authorization", `Bearer ${owner.accessToken}`)
+      .set("x-tenant-id", owner.tenantId)
+      .send({
+        movieId,
+        roomId: room.id,
+        startsAt: "2026-04-21T18:00:00Z",
+        endsAt: "2026-04-21T20:30:00Z",
+      });
+
+    expect(response.status).toBe(201);
+
+    const sessionSeats = await db
+      .select()
+      .from(catalogSessionSeats)
+      .where(eq(catalogSessionSeats.sessionId, response.body.id));
+
+    expect(sessionSeats).toHaveLength(3);
+    expect(sessionSeats.map((seat) => seat.seatKey)).toEqual(["A-1", "A-3", "B-1"]);
+  });
+
+  it("should keep session seats frozen after room layout updates", async () => {
+    mockMovieCatalog();
+
+    const owner = await createTenantAndLoginOwner("sessions-seat-freeze");
+    const room = await createRoomWithSeatLayout(owner, buildMixedSeatLayout(), "Frozen Room");
+    const movieId = await importMovie(owner);
+
+    const createSessionResponse = await request(app.server)
+      .post("/sessions")
+      .set("Authorization", `Bearer ${owner.accessToken}`)
+      .set("x-tenant-id", owner.tenantId)
+      .send({
+        movieId,
+        roomId: room.id,
+        startsAt: "2026-04-22T18:00:00Z",
+        endsAt: "2026-04-22T20:30:00Z",
+      });
+
+    expect(createSessionResponse.status).toBe(201);
+
+    const updateRoomResponse = await request(app.server)
+      .patch(`/rooms/${room.id}`)
+      .set("Authorization", `Bearer ${owner.accessToken}`)
+      .set("x-tenant-id", owner.tenantId)
+      .send({
+        seatLayout: buildSeatLayout(3),
+      });
+
+    expect(updateRoomResponse.status).toBe(200);
+
+    const sessionSeats = await db
+      .select()
+      .from(catalogSessionSeats)
+      .where(eq(catalogSessionSeats.sessionId, createSessionResponse.body.id));
+
+    expect(sessionSeats).toHaveLength(3);
+    expect(sessionSeats.map((seat) => seat.seatKey)).toEqual(["A-1", "A-3", "B-1"]);
   });
 
   it("should reject session creation when movie belongs to another tenant", async () => {

@@ -117,10 +117,11 @@ Specs importantes hoje:
 - `specs/movies-module.md`: estrategia do modulo `movies` como catalogo interno alimentado por provider externo
 - `specs/rooms-and-sessions-module.md`: direcao de planejamento para os proximos modulos operacionais de salas e sessoes
 - `specs/sessions-module.md`: spec detalhada da primeira entrega do modulo `sessions`, alinhada ao estado atual de `movies` e `rooms`
+- `specs/session-seats-module.md`: spec detalhada da proxima entrega de mapa de assentos por sessao, preparando a evolucao para reservas com concorrencia
 
 ## Estado real da implementacao
 
-Hoje o sistema e uma API backend de processo unico, com IAM maduro para a fase atual, `movies` funcional como catalogo interno, `rooms` operacional e `sessions` com primeira entrega funcional.
+Hoje o sistema e uma API backend de processo unico, com IAM maduro para a fase atual, `movies` funcional como catalogo interno, `rooms` operacional, `sessions` com primeira entrega funcional e `session-seats` iniciado na Task 1 de materializacao estrutural.
 
 O modulo `movies` ja implementa busca em provider externo, importacao para catalogo interno por tenant e listagem de filmes importados, mantendo o contrato arquitetural do projeto.
 
@@ -129,6 +130,8 @@ A estrategia definida para `movies` e trata-lo como catalogo interno do tenant a
 O modulo `rooms` agora fornece cadastro e consulta de salas por tenant, com layout de assentos persistido em JSON e `seat_count` derivado do layout ativo.
 
 O modulo `sessions` agora fornece agenda operacional por tenant, vinculando filme interno e sala, persistindo `room_layout_snapshot` e bloqueando conflito de horario na mesma sala.
+
+O modulo `session-seats` agora possui modelagem inicial persistida para materializar assentos ativos por sessao a partir de `room_layout_snapshot`, ainda sem endpoints publicos de leitura ou bloqueio operacional.
 
 ### Foundation pronta
 
@@ -195,6 +198,22 @@ Ja existe implementacao para:
 - bloqueio de sobreposicao entre sessoes `SCHEDULED` na mesma sala
 - RBAC de escrita permitindo `OWNER`, `ADMIN` e `STAFF`
 
+### Session Seats iniciado na Task 1
+
+Ja existe implementacao para:
+
+- tabela `catalog.session_seats`
+- materializacao de assentos ativos na mesma transacao de criacao da sessao
+- identidade estavel por `seat_key` derivada de `row_label + seat_number`
+- isolamento por tenant via `tenant_id` persistido no assento da sessao
+- status inicial `AVAILABLE` para assentos materializados
+
+Ainda nao existe nesta fase:
+
+- `GET /sessions/:sessionId/seats`
+- bloqueio e desbloqueio operacional
+- reservas ou holds concorrentes
+
 ### Rotas atuais
 
 Rotas publicas:
@@ -238,6 +257,7 @@ Tabelas atuais:
 - `catalog.movies`
 - `catalog.rooms`
 - `catalog.sessions`
+- `catalog.session_seats`
 
 Relacoes principais:
 
@@ -246,6 +266,7 @@ Relacoes principais:
 - membership conecta `user <-> tenant` com `role`
 - um user possui varios refresh tokens
 - uma session pertence a um tenant, um movie interno e uma room
+- um session_seat pertence a um tenant e a uma session
 
 Garantias importantes ja presentes:
 
@@ -313,6 +334,7 @@ Cobertura atual relevante:
 - fluxo inicial de `movies` com busca, importacao duplicada e isolamento por tenant
 - fluxo inicial de `rooms` com criacao por `STAFF`, validacao de layout, patch e isolamento por tenant
 - fluxo inicial de `sessions` com criacao por `STAFF`, snapshot de layout, conflito de horario e isolamento por tenant
+- materializacao inicial de `session_seats` a partir do snapshot da sessao, incluindo filtragem de assentos inativos e congelamento apos alteracao da sala
 
 Lacunas percebidas hoje:
 
@@ -359,7 +381,9 @@ Leitura honesta do estado atual:
 - a integracao externa inicial com TMDB tambem ja comecou na pratica
 - para fins de roadmap de estudo, `movies` nao precisa de consolidacao extensa antes de o projeto avancar para `rooms`/salas e `sessions`
 - `sessions` agora cobre a primeira agenda operacional por sala, com snapshot de layout e prevencao de conflito de horario
+- `session-seats` iniciou sua primeira task estrutural com materializacao persistida de assentos por sessao
 - o proximo passo planejado agora e implementar mapa de assentos por sessao e depois reservas com concorrencia
+- a nova spec `specs/session-seats-module.md` passa a ser a referencia da proxima fase planejada
 - `specs/sessions-module.md` passa a servir como memoria da primeira entrega do modulo e referencia para sua evolucao
 
 ## Inconsistencias atuais entre docs e codigo

@@ -7,9 +7,8 @@
     "skipLibCheck": true,
     "types": ["node"],
     "outDir": "dist",
-    "baseUrl": ".",
     "paths": {
-      "src/*": ["src/*"]
+      "src/*": ["./src/*"]
     }
   },
   "include": ["src/**/*", "src/**/*.d.ts", "drizzle.config.ts"]

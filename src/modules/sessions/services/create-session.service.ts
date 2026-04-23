@@ -3,6 +3,7 @@ import { db } from "src/shared/db/client";
 
 import type { CatalogMoviesRepository } from "src/modules/movies/repositories/contracts";
 import type { CatalogRoomsRepository } from "src/modules/rooms/repositories/contracts";
+import type { MaterializeSessionSeatsService } from "src/modules/session-seats/services/materialize-session-seats.service";
 
 import type { CreateSessionInput, CreateSessionOutput } from "../dtos/create-session.dto";
 import type { CatalogSessionsRepository } from "../repositories/contracts";
@@ -12,6 +13,7 @@ export class CreateSessionService {
     private catalogSessionsRepo: CatalogSessionsRepository,
     private catalogMoviesRepo: CatalogMoviesRepository,
     private catalogRoomsRepo: CatalogRoomsRepository,
+    private materializeSessionSeatsService: MaterializeSessionSeatsService,
   ) {}
 
   async execute(input: CreateSessionInput): Promise<CreateSessionOutput> {
@@ -52,7 +54,7 @@ export class CreateSessionService {
         throw new ApiError("Room already has a scheduled session in this time range", 409);
       }
 
-      return this.catalogSessionsRepo.create(
+      const session = await this.catalogSessionsRepo.create(
         {
           tenantId: input.tenantId,
           movieId: input.movieId,
@@ -64,6 +66,17 @@ export class CreateSessionService {
         },
         tx,
       );
+
+      await this.materializeSessionSeatsService.execute(
+        {
+          tenantId: input.tenantId,
+          sessionId: session.id,
+          roomLayoutSnapshot: session.roomLayoutSnapshot,
+        },
+        tx,
+      );
+
+      return session;
     });
   }
 }
