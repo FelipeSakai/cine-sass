@@ -152,12 +152,23 @@ Ja existe implementacao para:
 - persistencia de `room_layout_snapshot` no momento da criacao
 - bloqueio de conflito de horario na mesma sala
 
+### Session seats implementado no escopo inicial
+
+Ja existe implementacao para:
+
+- materializacao de assentos ativos por sessao a partir de `room_layout_snapshot`
+- leitura do mapa da sessao via `GET /sessions/:sessionId/seats`
+- ordenacao canonica por fileira e numero
+- resumo agregado por status (`total`, `available`, `blocked`, `reserved`)
+- bloqueio operacional via `PATCH /sessions/:sessionId/seats/:seatId/block`
+- desbloqueio operacional via `PATCH /sessions/:sessionId/seats/:seatId/unblock`
+- isolamento por tenant na leitura e escrita do mapa
+
 ### O que ainda nao existe
 
 Ainda nao ha implementacao real para:
 
-- mapa de assentos
-- reserva concorrente
+- reservas concorrentes
 - pedidos e checkout
 - tickets e check-in
 - Redis ativo
@@ -195,6 +206,9 @@ Ainda nao ha implementacao real para:
 - `POST /sessions`
 - `GET /sessions`
 - `GET /sessions/:sessionId`
+- `GET /sessions/:sessionId/seats`
+- `PATCH /sessions/:sessionId/seats/:seatId/block`
+- `PATCH /sessions/:sessionId/seats/:seatId/unblock`
 
 ---
 
@@ -228,6 +242,7 @@ Tabelas atuais:
 - `catalog.movies`
 - `catalog.rooms`
 - `catalog.sessions`
+- `catalog.session_seats`
 
 Relacoes importantes:
 
@@ -236,6 +251,7 @@ Relacoes importantes:
 - membership conecta `user` e `tenant` com `role`
 - um user possui varios refresh tokens
 - uma `session` pertence a um `tenant`, um `movie` interno e uma `room`
+- uma `session_seat` pertence a um `tenant` e a uma `session`
 
 Roles atuais:
 

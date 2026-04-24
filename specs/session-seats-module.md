@@ -81,8 +81,8 @@ Esta fase fica mais clara se for tratada como uma sequencia curta de tasks indep
 Estado da implementacao no momento:
 
 - `Task 1` concluida
-- `Task 2` ainda nao iniciada
-- `Task 3` ainda nao iniciada
+- `Task 2` concluida
+- `Task 3` concluida
 - `Task 4` ainda nao iniciada
 
 O que ja existe no codigo:
@@ -92,11 +92,14 @@ O que ja existe no codigo:
 - modulo proprio `src/modules/session-seats`
 - materializacao de assentos ativos durante a criacao da sessao
 - persistencia de `seat_key`, `row_label`, `seat_number`, `seat_type` e status inicial `AVAILABLE`
-- testes E2E cobrindo materializacao, filtragem de assentos inativos e congelamento apos alteracao da sala
+- `GET /sessions/:sessionId/seats` com resumo agregado por status
+- `PATCH /sessions/:sessionId/seats/:seatId/block`
+- `PATCH /sessions/:sessionId/seats/:seatId/unblock`
+- testes E2E cobrindo materializacao, leitura, filtragem de assentos inativos, resumo, transicoes de status, RBAC e congelamento apos alteracao da sala
 
 Ponto de parada para retomar depois:
 
-- proxima implementacao prevista: `Task 2`, com `GET /sessions/:sessionId/seats` e resumo agregado de disponibilidade
+- proxima implementacao prevista: `Task 4`, para explicitar o tratamento de sessoes legadas sem mapa materializado
 
 ## Task 1: Materializacao estrutural dos assentos da sessao
 
@@ -152,6 +155,10 @@ Definition of done sugerida:
 - a resposta traz `summary.total`, `summary.available`, `summary.blocked` e `summary.reserved`
 - sessoes de outro tenant nao vazam dados
 
+Status de implementacao:
+
+- concluida
+
 ## Task 3: Bloqueio operacional manual
 
 Objetivo:
@@ -176,6 +183,10 @@ Definition of done sugerida:
 - apenas `AVAILABLE` vira `BLOCKED`
 - apenas `BLOCKED` volta para `AVAILABLE`
 - tentativas invalidas retornam erro de regra de negocio previsivel
+
+Status de implementacao:
+
+- concluida
 
 ## Task 4: Compatibilidade com sessoes ja existentes
 

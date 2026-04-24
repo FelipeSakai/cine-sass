@@ -121,7 +121,7 @@ Specs importantes hoje:
 
 ## Estado real da implementacao
 
-Hoje o sistema e uma API backend de processo unico, com IAM maduro para a fase atual, `movies` funcional como catalogo interno, `rooms` operacional, `sessions` com primeira entrega funcional e `session-seats` iniciado na Task 1 de materializacao estrutural.
+Hoje o sistema e uma API backend de processo unico, com IAM maduro para a fase atual, `movies` funcional como catalogo interno, `rooms` operacional, `sessions` com primeira entrega funcional e `session-seats` com leitura e bloqueio operacional manual iniciais.
 
 O modulo `movies` ja implementa busca em provider externo, importacao para catalogo interno por tenant e listagem de filmes importados, mantendo o contrato arquitetural do projeto.
 
@@ -131,7 +131,7 @@ O modulo `rooms` agora fornece cadastro e consulta de salas por tenant, com layo
 
 O modulo `sessions` agora fornece agenda operacional por tenant, vinculando filme interno e sala, persistindo `room_layout_snapshot` e bloqueando conflito de horario na mesma sala.
 
-O modulo `session-seats` agora possui modelagem inicial persistida para materializar assentos ativos por sessao a partir de `room_layout_snapshot`, ainda sem endpoints publicos de leitura ou bloqueio operacional.
+O modulo `session-seats` agora possui modelagem persistida para materializar assentos ativos por sessao a partir de `room_layout_snapshot`, endpoint publico de leitura do mapa e bloqueio operacional manual por assento.
 
 ### Foundation pronta
 
@@ -198,7 +198,7 @@ Ja existe implementacao para:
 - bloqueio de sobreposicao entre sessoes `SCHEDULED` na mesma sala
 - RBAC de escrita permitindo `OWNER`, `ADMIN` e `STAFF`
 
-### Session Seats iniciado na Task 1
+### Session Seats com Tasks 2 e 3 concluidas
 
 Ja existe implementacao para:
 
@@ -207,11 +207,12 @@ Ja existe implementacao para:
 - identidade estavel por `seat_key` derivada de `row_label + seat_number`
 - isolamento por tenant via `tenant_id` persistido no assento da sessao
 - status inicial `AVAILABLE` para assentos materializados
+- `GET /sessions/:sessionId/seats` com ordenacao canonica e resumo agregado por status
+- `PATCH /sessions/:sessionId/seats/:seatId/block` para bloquear assento `AVAILABLE`
+- `PATCH /sessions/:sessionId/seats/:seatId/unblock` para devolver assento `BLOCKED` a `AVAILABLE`
 
 Ainda nao existe nesta fase:
 
-- `GET /sessions/:sessionId/seats`
-- bloqueio e desbloqueio operacional
 - reservas ou holds concorrentes
 
 ### Rotas atuais
@@ -243,6 +244,9 @@ Rotas protegidas:
 - `POST /sessions`
 - `GET /sessions`
 - `GET /sessions/:sessionId`
+- `GET /sessions/:sessionId/seats`
+- `PATCH /sessions/:sessionId/seats/:seatId/block`
+- `PATCH /sessions/:sessionId/seats/:seatId/unblock`
 
 ## Modelo de dados atual
 
@@ -377,12 +381,12 @@ Leitura honesta do estado atual:
 - modulo 1 esta bem mais avancado do que o README sugere
 - parte do modulo 2 ja comecou na pratica (tenant context + roles + membership checks)
 - modulo 3 ja comecou funcionalmente com catalogo interno inicial
-- `rooms` e `sessions` ja iniciaram a cadeia operacional do cinema, mas mapa de assentos por sessao e reservas ainda nao existem
+- `rooms` e `sessions` ja iniciaram a cadeia operacional do cinema, e `session-seats` agora cobre leitura e bloqueio operacional manual do mapa por sessao, mas reservas ainda nao existem
 - a integracao externa inicial com TMDB tambem ja comecou na pratica
 - para fins de roadmap de estudo, `movies` nao precisa de consolidacao extensa antes de o projeto avancar para `rooms`/salas e `sessions`
 - `sessions` agora cobre a primeira agenda operacional por sala, com snapshot de layout e prevencao de conflito de horario
-- `session-seats` iniciou sua primeira task estrutural com materializacao persistida de assentos por sessao
-- o proximo passo planejado agora e implementar mapa de assentos por sessao e depois reservas com concorrencia
+- `session-seats` agora possui materializacao persistida, leitura operacional e bloqueio manual por assento
+- o proximo passo planejado agora e implementar reservas com concorrencia sobre `session_seats`
 - a nova spec `specs/session-seats-module.md` passa a ser a referencia da proxima fase planejada
 - `specs/sessions-module.md` passa a servir como memoria da primeira entrega do modulo e referencia para sua evolucao
 
@@ -458,4 +462,4 @@ Quando houver conflito entre narrativa e implementacao:
 
 ## Ultima leitura consolidada
 
-Baseado no estado atual do repositorio em `Thu Apr 16 2026`, ja considerando a entrega funcional inicial dos modulos `rooms` e `sessions`.
+Baseado no estado atual do repositorio em `Thu Apr 23 2026`, ja considerando a leitura operacional inicial do modulo `session-seats`.
