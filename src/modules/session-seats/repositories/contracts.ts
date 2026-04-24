@@ -20,4 +20,17 @@ export interface CatalogSessionSeatsRepository {
     tenantId: string,
     executor?: DbExecutor,
   ): Promise<CatalogSessionSeatRecord[]>;
+  findByIdAndSessionIdAndTenantId(
+    seatId: string,
+    sessionId: string,
+    tenantId: string,
+    executor?: DbExecutor,
+  ): Promise<CatalogSessionSeatRecord | null>;
+  updateStatusByIdAndSessionIdAndTenantId(
+    seatId: string,
+    sessionId: string,
+    tenantId: string,
+    status: CatalogSessionSeatInsert["status"],
+    executor?: DbExecutor,
+  ): Promise<CatalogSessionSeatRecord | null>;
 }

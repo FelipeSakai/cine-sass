@@ -46,4 +46,46 @@ export class DrizzleCatalogSessionSeatsRepository implements CatalogSessionSeats
         asc(catalogSessionSeats.createdAt),
       );
   }
+
+  async findByIdAndSessionIdAndTenantId(
+    seatId: string,
+    sessionId: string,
+    tenantId: string,
+    executor: DbExecutor = db,
+  ): Promise<CatalogSessionSeatRecord | null> {
+    const [seat] = await executor
+      .select()
+      .from(catalogSessionSeats)
+      .where(
+        and(
+          eq(catalogSessionSeats.id, seatId),
+          eq(catalogSessionSeats.sessionId, sessionId),
+          eq(catalogSessionSeats.tenantId, tenantId),
+        ),
+      );
+
+    return seat ?? null;
+  }
+
+  async updateStatusByIdAndSessionIdAndTenantId(
+    seatId: string,
+    sessionId: string,
+    tenantId: string,
+    status: CatalogSessionSeatInsert["status"],
+    executor: DbExecutor = db,
+  ): Promise<CatalogSessionSeatRecord | null> {
+    const [seat] = await executor
+      .update(catalogSessionSeats)
+      .set({ status, updatedAt: new Date() })
+      .where(
+        and(
+          eq(catalogSessionSeats.id, seatId),
+          eq(catalogSessionSeats.sessionId, sessionId),
+          eq(catalogSessionSeats.tenantId, tenantId),
+        ),
+      )
+      .returning();
+
+    return seat ?? null;
+  }
 }
