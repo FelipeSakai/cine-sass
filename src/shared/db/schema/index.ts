@@ -4,3 +4,4 @@ export * from "./movies";
 export * from "./rooms";
 export * from "./sessions";
 export * from "./session-seats";
+export * from "./reservations";

@@ -50,6 +50,13 @@
       "when": 1776897490497,
       "tag": "0006_eminent_mole_man",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1778709859160,
+      "tag": "0007_thin_la_nuit",
+      "breakpoints": true
     }
   ]
 }

@@ -18,6 +18,7 @@ import { catalogSessions } from "./sessions";
 export const sessionSeatStatus = pgEnum("session_seat_status", [
   "AVAILABLE",
   "BLOCKED",
+  "HELD",
   "RESERVED",
 ]);
 
