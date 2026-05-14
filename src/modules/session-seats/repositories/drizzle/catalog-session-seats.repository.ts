@@ -1,4 +1,4 @@
-import { and, asc, eq } from "drizzle-orm";
+import { and, asc, eq, inArray } from "drizzle-orm";
 
 import type { DbExecutor } from "src/modules/iam/repositories/contracts";
 import { db } from "src/shared/db/client";
@@ -7,6 +7,7 @@ import { catalogSessionSeats } from "src/shared/db/schema";
 import type {
   CatalogSessionSeatInsert,
   CatalogSessionSeatRecord,
+  CatalogSessionSeatStatus,
   CatalogSessionSeatsRepository,
 } from "../contracts";
 
@@ -65,6 +66,83 @@ export class DrizzleCatalogSessionSeatsRepository implements CatalogSessionSeats
       );
 
     return seat ?? null;
+  }
+
+  async findManyByIdsAndSessionIdAndTenantId(
+    seatIds: string[],
+    sessionId: string,
+    tenantId: string,
+    executor: DbExecutor = db,
+  ): Promise<CatalogSessionSeatRecord[]> {
+    if (seatIds.length === 0) {
+      return [];
+    }
+
+    return executor
+      .select()
+      .from(catalogSessionSeats)
+      .where(
+        and(
+          inArray(catalogSessionSeats.id, seatIds),
+          eq(catalogSessionSeats.sessionId, sessionId),
+          eq(catalogSessionSeats.tenantId, tenantId),
+        ),
+      )
+      .orderBy(
+        asc(catalogSessionSeats.rowLabel),
+        asc(catalogSessionSeats.seatNumber),
+        asc(catalogSessionSeats.createdAt),
+      );
+  }
+
+  async holdManyAvailableByIdsAndSessionIdAndTenantId(
+    seatIds: string[],
+    sessionId: string,
+    tenantId: string,
+    executor: DbExecutor = db,
+  ): Promise<CatalogSessionSeatRecord[]> {
+    if (seatIds.length === 0) {
+      return [];
+    }
+
+    return executor
+      .update(catalogSessionSeats)
+      .set({ status: "HELD", updatedAt: new Date() })
+      .where(
+        and(
+          inArray(catalogSessionSeats.id, seatIds),
+          eq(catalogSessionSeats.sessionId, sessionId),
+          eq(catalogSessionSeats.tenantId, tenantId),
+          eq(catalogSessionSeats.status, "AVAILABLE"),
+        ),
+      )
+      .returning();
+  }
+
+  async updateManyByIdsAndSessionIdAndTenantId(
+    seatIds: string[],
+    sessionId: string,
+    tenantId: string,
+    currentStatus: CatalogSessionSeatStatus,
+    nextStatus: CatalogSessionSeatStatus,
+    executor: DbExecutor = db,
+  ): Promise<CatalogSessionSeatRecord[]> {
+    if (seatIds.length === 0) {
+      return [];
+    }
+
+    return executor
+      .update(catalogSessionSeats)
+      .set({ status: nextStatus, updatedAt: new Date() })
+      .where(
+        and(
+          inArray(catalogSessionSeats.id, seatIds),
+          eq(catalogSessionSeats.sessionId, sessionId),
+          eq(catalogSessionSeats.tenantId, tenantId),
+          eq(catalogSessionSeats.status, currentStatus),
+        ),
+      )
+      .returning();
   }
 
   async updateStatusByIdAndSessionIdAndTenantId(

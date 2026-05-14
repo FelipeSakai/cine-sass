@@ -42,6 +42,10 @@ export class ListSessionSeatsService {
           acc.blocked += 1;
         }
 
+        if (seat.status === "HELD") {
+          acc.held += 1;
+        }
+
         if (seat.status === "RESERVED") {
           acc.reserved += 1;
         }
@@ -52,6 +56,7 @@ export class ListSessionSeatsService {
         total: 0,
         available: 0,
         blocked: 0,
+        held: 0,
         reserved: 0,
       },
     );

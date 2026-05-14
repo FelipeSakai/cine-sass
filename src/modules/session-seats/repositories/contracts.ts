@@ -5,6 +5,7 @@ import { catalogSessionSeats } from "src/shared/db/schema";
 
 export type CatalogSessionSeatInsert = InferInsertModel<typeof catalogSessionSeats>;
 export type CatalogSessionSeatRecord = InferSelectModel<typeof catalogSessionSeats>;
+export type CatalogSessionSeatStatus = NonNullable<CatalogSessionSeatInsert["status"]>;
 
 export interface CatalogSessionSeatsRepository {
   createMany(
@@ -20,12 +21,32 @@ export interface CatalogSessionSeatsRepository {
     tenantId: string,
     executor?: DbExecutor,
   ): Promise<CatalogSessionSeatRecord[]>;
+  findManyByIdsAndSessionIdAndTenantId(
+    seatIds: string[],
+    sessionId: string,
+    tenantId: string,
+    executor?: DbExecutor,
+  ): Promise<CatalogSessionSeatRecord[]>;
   findByIdAndSessionIdAndTenantId(
     seatId: string,
     sessionId: string,
     tenantId: string,
     executor?: DbExecutor,
   ): Promise<CatalogSessionSeatRecord | null>;
+  holdManyAvailableByIdsAndSessionIdAndTenantId(
+    seatIds: string[],
+    sessionId: string,
+    tenantId: string,
+    executor?: DbExecutor,
+  ): Promise<CatalogSessionSeatRecord[]>;
+  updateManyByIdsAndSessionIdAndTenantId(
+    seatIds: string[],
+    sessionId: string,
+    tenantId: string,
+    currentStatus: CatalogSessionSeatStatus,
+    nextStatus: CatalogSessionSeatStatus,
+    executor?: DbExecutor,
+  ): Promise<CatalogSessionSeatRecord[]>;
   updateStatusByIdAndSessionIdAndTenantId(
     seatId: string,
     sessionId: string,

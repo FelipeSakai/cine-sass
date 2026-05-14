@@ -13,6 +13,7 @@ export type ListSessionSeatsOutput = {
     total: number;
     available: number;
     blocked: number;
+    held: number;
     reserved: number;
   };
   seats: ListSessionSeatsOutputItem[];

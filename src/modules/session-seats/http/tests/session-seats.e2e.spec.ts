@@ -232,6 +232,7 @@ describe("session-seats routes", () => {
         total: 3,
         available: 3,
         blocked: 0,
+        held: 0,
         reserved: 0,
       },
     });
@@ -306,6 +307,7 @@ describe("session-seats routes", () => {
       total: 3,
       available: 1,
       blocked: 1,
+      held: 0,
       reserved: 1,
     });
   });

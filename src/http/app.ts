@@ -10,6 +10,7 @@ import { registerAuthRoutes } from "src/modules/iam/http/routes/auth.routes";
 import { registerMoviesRoutes } from "src/modules/movies/http/routes/movies.routes";
 import { registerRoomsRoutes } from "src/modules/rooms/http/routes/rooms.routes";
 import { registerSessionSeatsRoutes } from "src/modules/session-seats/http/routes/session-seats.routes";
+import { registerReservationsRoutes } from "src/modules/reservations/http/routes/reservations.routes";
 import { registerSessionsRoutes } from "src/modules/sessions/http/routes/sessions.routes";
 
 export async function buildApp() {
@@ -34,6 +35,7 @@ export async function buildApp() {
   await registerRoomsRoutes(app);
   await registerSessionsRoutes(app);
   await registerSessionSeatsRoutes(app);
+  await registerReservationsRoutes(app);
 
   return app;
 }
