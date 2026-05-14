@@ -13,8 +13,8 @@ Contexto importante: este e um projeto de estudos, mas com intencao de simular u
 - Nome: `CineSaaS`
 - Tipo: backend SaaS multi-tenant para cinemas
 - Foco principal: estudos avancados de arquitetura backend, auth, multi-tenant, concorrencia, observabilidade e IA aplicada
-- Estagio atual: fundacao pronta, IAM/Auth avancado, modulo `movies` funcional e modulo `rooms` com primeira entrega operacional
-- Dominio implementado hoje: `iam`, `movies` e escopo inicial de `rooms`
+- Estagio atual: fundacao pronta, IAM/Auth avancado, `movies`, `rooms`, `sessions` e `session-seats` operacionais, com modelagem inicial de `reservations` iniciada
+- Dominio implementado hoje: `iam`, `movies`, `rooms`, `sessions`, `session-seats` e modelagem inicial de `reservations`
 - Estilo arquitetural: modular, orientado a dominio, com controllers finos e regras nos services
 
 ## Intencao do projeto
@@ -118,10 +118,11 @@ Specs importantes hoje:
 - `specs/rooms-and-sessions-module.md`: direcao de planejamento para os proximos modulos operacionais de salas e sessoes
 - `specs/sessions-module.md`: spec detalhada da primeira entrega do modulo `sessions`, alinhada ao estado atual de `movies` e `rooms`
 - `specs/session-seats-module.md`: spec detalhada da proxima entrega de mapa de assentos por sessao, preparando a evolucao para reservas com concorrencia
+- `specs/reservations-module.md`: spec detalhada da proxima fase de reservas com concorrencia, hold temporario e confirmacao segura sobre `session_seats`
 
 ## Estado real da implementacao
 
-Hoje o sistema e uma API backend de processo unico, com IAM maduro para a fase atual, `movies` funcional como catalogo interno, `rooms` operacional, `sessions` com primeira entrega funcional e `session-seats` com leitura e bloqueio operacional manual iniciais.
+Hoje o sistema e uma API backend de processo unico, com IAM maduro para a fase atual, `movies` funcional como catalogo interno, `rooms` operacional, `sessions` com primeira entrega funcional, `session-seats` com leitura e bloqueio operacional manual iniciais, e `reservations` com criacao de hold, confirmacao, cancelamento, expiracao lazy e leitura operacional iniciais.
 
 O modulo `movies` ja implementa busca em provider externo, importacao para catalogo interno por tenant e listagem de filmes importados, mantendo o contrato arquitetural do projeto.
 
@@ -132,6 +133,8 @@ O modulo `rooms` agora fornece cadastro e consulta de salas por tenant, com layo
 O modulo `sessions` agora fornece agenda operacional por tenant, vinculando filme interno e sala, persistindo `room_layout_snapshot` e bloqueando conflito de horario na mesma sala.
 
 O modulo `session-seats` agora possui modelagem persistida para materializar assentos ativos por sessao a partir de `room_layout_snapshot`, endpoint publico de leitura do mapa e bloqueio operacional manual por assento.
+
+O modulo `reservations` agora ja possui modelagem persistida, criacao inicial de hold, confirmacao, cancelamento, expiracao lazy e leitura operacional, mas ainda nao fechou fases futuras como pedidos/checkout.
 
 ### Foundation pronta
 
@@ -207,13 +210,35 @@ Ja existe implementacao para:
 - identidade estavel por `seat_key` derivada de `row_label + seat_number`
 - isolamento por tenant via `tenant_id` persistido no assento da sessao
 - status inicial `AVAILABLE` para assentos materializados
+- suporte ao estado `HELD` no enum de status do assento da sessao
 - `GET /sessions/:sessionId/seats` com ordenacao canonica e resumo agregado por status
 - `PATCH /sessions/:sessionId/seats/:seatId/block` para bloquear assento `AVAILABLE`
 - `PATCH /sessions/:sessionId/seats/:seatId/unblock` para devolver assento `BLOCKED` a `AVAILABLE`
 
 Ainda nao existe nesta fase:
 
-- reservas ou holds concorrentes
+- reservas ou holds concorrentes funcionais
+
+### Reservations com Tasks 1, 2, 3 e 4 iniciadas no codigo
+
+Ja existe implementacao para:
+
+- enum `reservation_status`
+- tabela `catalog.reservations`
+- tabela `catalog.reservation_seats`
+- estado `HELD` adicionado ao enum de `session_seats`
+- `POST /sessions/:sessionId/reservations` para criacao inicial de hold
+- `GET /reservations/:reservationId` para leitura operacional inicial da reserva
+- `POST /reservations/:reservationId/confirm` para confirmar hold
+- `POST /reservations/:reservationId/cancel` para cancelar hold
+- repositories Drizzle iniciais do modulo
+- services transacionais iniciais para segurar, confirmar, cancelar, expirar lazy e ler reservas
+- spec propria em `specs/reservations-module.md`
+- testes E2E validados localmente para hold, confirmacao, cancelamento, expiracao lazy, leitura e concorrencia basica
+
+Ainda nao existe nesta fase:
+
+- pedidos/checkout
 
 ### Rotas atuais
 
@@ -247,6 +272,10 @@ Rotas protegidas:
 - `GET /sessions/:sessionId/seats`
 - `PATCH /sessions/:sessionId/seats/:seatId/block`
 - `PATCH /sessions/:sessionId/seats/:seatId/unblock`
+- `POST /sessions/:sessionId/reservations`
+- `GET /reservations/:reservationId`
+- `POST /reservations/:reservationId/confirm`
+- `POST /reservations/:reservationId/cancel`
 
 ## Modelo de dados atual
 
@@ -262,6 +291,8 @@ Tabelas atuais:
 - `catalog.rooms`
 - `catalog.sessions`
 - `catalog.session_seats`
+- `catalog.reservations`
+- `catalog.reservation_seats`
 
 Relacoes principais:
 
@@ -271,6 +302,8 @@ Relacoes principais:
 - um user possui varios refresh tokens
 - uma session pertence a um tenant, um movie interno e uma room
 - um session_seat pertence a um tenant e a uma session
+- uma reservation pertence a um tenant, a uma session e a um user criador
+- uma reservation possui varios reservation_seats
 
 Garantias importantes ja presentes:
 
@@ -381,13 +414,13 @@ Leitura honesta do estado atual:
 - modulo 1 esta bem mais avancado do que o README sugere
 - parte do modulo 2 ja comecou na pratica (tenant context + roles + membership checks)
 - modulo 3 ja comecou funcionalmente com catalogo interno inicial
-- `rooms` e `sessions` ja iniciaram a cadeia operacional do cinema, e `session-seats` agora cobre leitura e bloqueio operacional manual do mapa por sessao, mas reservas ainda nao existem
+- `rooms` e `sessions` ja iniciaram a cadeia operacional do cinema, e `session-seats` agora cobre leitura e bloqueio operacional manual do mapa por sessao, enquanto `reservations` ja iniciou hold, confirmacao, cancelamento, expiracao lazy e leitura, mas ainda nao fechou a fase de concorrencia completa
 - a integracao externa inicial com TMDB tambem ja comecou na pratica
 - para fins de roadmap de estudo, `movies` nao precisa de consolidacao extensa antes de o projeto avancar para `rooms`/salas e `sessions`
 - `sessions` agora cobre a primeira agenda operacional por sala, com snapshot de layout e prevencao de conflito de horario
-- `session-seats` agora possui materializacao persistida, leitura operacional e bloqueio manual por assento
+- `session-seats` agora possui materializacao persistida, leitura operacional, suporte a `HELD` e bloqueio manual por assento
 - o proximo passo planejado agora e implementar reservas com concorrencia sobre `session_seats`
-- a nova spec `specs/session-seats-module.md` passa a ser a referencia da proxima fase planejada
+- `specs/reservations-module.md` passa a ser a referencia principal da fase atual em andamento
 - `specs/sessions-module.md` passa a servir como memoria da primeira entrega do modulo e referencia para sua evolucao
 
 ## Inconsistencias atuais entre docs e codigo
