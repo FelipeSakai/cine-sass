@@ -1,6 +1,6 @@
 # CineSaaS - Backend SaaS multi-tenant para cinemas
 
-Backend de um SaaS multi-tenant para cinemas, construido como projeto de estudos com foco em arquitetura backend, autenticacao, multi-tenancy, concorrencia, observabilidade e IA aplicada.
+Backend de um SaaS multi-tenant para cinemas, construido como projeto de estudos com foco em arquitetura backend, autenticacao, multi-tenancy e concorrencia aplicada ao dominio operacional do cinema.
 
 O objetivo nao e apenas entregar features. O objetivo principal e aprender e demonstrar decisoes de engenharia proximas de um sistema real, com codigo organizado, evolucao modular e preocupacao com qualidade.
 
@@ -8,19 +8,17 @@ O objetivo nao e apenas entregar features. O objetivo principal e aprender e dem
 
 ## Visao geral
 
-O CineSaaS foi pensado para evoluir como uma plataforma em que varios cinemas usam a mesma aplicacao com isolamento por tenant.
+O CineSaaS foi pensado como uma plataforma em que varios cinemas usam a mesma aplicacao com isolamento por tenant.
 
-No desenho completo do produto, a aplicacao deve permitir:
+Na versao `v1` encerrada neste repositorio, a aplicacao permite:
 
 - gerenciar usuarios e permissoes
 - operar com contexto multi-tenant real
 - cadastrar filmes, salas e sessoes
-- reservar assentos com seguranca
-- vender ingressos
-- validar tickets no check-in
-- futuramente oferecer recursos de IA isolados por tenant
+- consultar e operar o mapa de assentos por sessao
+- criar hold, confirmar e cancelar reservas operacionais
 
-Hoje, porem, o modulo realmente implementado e o de IAM/Auth.
+Fora do escopo desta `v1` ficam deliberadamente `orders/checkout`, pagamento, tickets, check-in, filas, observabilidade pesada e IA. Essas trilhas podem virar projetos futuros.
 
 ---
 
@@ -67,9 +65,9 @@ Organizacao atual:
 
 - `src/http`: bootstrap da aplicacao
 - `src/shared`: concerns compartilhados como `db`, `env`, `errors` e `logger`
-- `src/modules/iam`: modulo de identidade e acesso
+- `src/modules`: modulos de dominio como `iam`, `movies`, `rooms`, `sessions`, `session-seats` e `reservations`
 
-Dentro do modulo `iam`:
+Padrao canonico dos modulos:
 
 - `http`: rotas, controllers, middlewares e testes E2E
 - `services`: casos de uso e regras de negocio
@@ -90,7 +88,7 @@ Principios que guiam o projeto:
 
 ## Estado atual da implementacao
 
-Hoje o projeto e uma API backend de processo unico, com foundation pronta, modulo IAM/Auth bem avancado, `movies` funcional, `rooms` operacional e primeira entrega funcional de `sessions`.
+Hoje o projeto e uma API backend de processo unico em fase de fechamento de `v1`, com foundation pronta, modulo IAM/Auth bem avancado, `movies` funcional, `rooms` operacional, `sessions` operacional, `session-seats` operacional e `reservations` funcional no fluxo principal.
 
 ### Foundation pronta
 
@@ -159,16 +157,27 @@ Ja existe implementacao para:
 - materializacao de assentos ativos por sessao a partir de `room_layout_snapshot`
 - leitura do mapa da sessao via `GET /sessions/:sessionId/seats`
 - ordenacao canonica por fileira e numero
-- resumo agregado por status (`total`, `available`, `blocked`, `reserved`)
+- resumo agregado por status (`total`, `available`, `blocked`, `held`, `reserved`)
 - bloqueio operacional via `PATCH /sessions/:sessionId/seats/:seatId/block`
 - desbloqueio operacional via `PATCH /sessions/:sessionId/seats/:seatId/unblock`
 - isolamento por tenant na leitura e escrita do mapa
+
+### Reservations implementado no escopo inicial da v1
+
+Ja existe implementacao para:
+
+- criacao de hold via `POST /sessions/:sessionId/reservations`
+- confirmacao via `POST /reservations/:reservationId/confirm`
+- cancelamento via `POST /reservations/:reservationId/cancel`
+- leitura operacional via `GET /reservations/:reservationId`
+- expiracao lazy de hold
+- concorrencia basica para evitar dupla reserva no mesmo assento
+- tabelas `catalog.reservations` e `catalog.reservation_seats`
 
 ### O que ainda nao existe
 
 Ainda nao ha implementacao real para:
 
-- reservas concorrentes
 - pedidos e checkout
 - tickets e check-in
 - Redis ativo
@@ -209,6 +218,10 @@ Ainda nao ha implementacao real para:
 - `GET /sessions/:sessionId/seats`
 - `PATCH /sessions/:sessionId/seats/:seatId/block`
 - `PATCH /sessions/:sessionId/seats/:seatId/unblock`
+- `POST /sessions/:sessionId/reservations`
+- `GET /reservations/:reservationId`
+- `POST /reservations/:reservationId/confirm`
+- `POST /reservations/:reservationId/cancel`
 
 ---
 
@@ -243,6 +256,8 @@ Tabelas atuais:
 - `catalog.rooms`
 - `catalog.sessions`
 - `catalog.session_seats`
+- `catalog.reservations`
+- `catalog.reservation_seats`
 
 Relacoes importantes:
 
@@ -252,6 +267,8 @@ Relacoes importantes:
 - um user possui varios refresh tokens
 - uma `session` pertence a um `tenant`, um `movie` interno e uma `room`
 - uma `session_seat` pertence a um `tenant` e a uma `session`
+- uma `reservation` pertence a um `tenant`, a uma `session` e ao usuario criador
+- uma `reservation` possui varios `reservation_seats`
 
 Roles atuais:
 
@@ -282,6 +299,8 @@ Cobertura relevante hoje:
 - fluxo inicial de `movies` com busca, importacao sem duplicidade e isolamento por tenant
 - fluxo inicial de `rooms` com criacao por `STAFF`, validacao de layout e isolamento por tenant
 - fluxo inicial de `sessions` com criacao por `STAFF`, snapshot de layout, conflito de horario e isolamento por tenant
+- fluxo principal de `session-seats` com materializacao, leitura, bloqueio e desbloqueio
+- fluxo principal de `reservations` com hold, confirmacao, cancelamento, expiracao lazy, leitura e concorrencia basica
 
 Lacunas atuais:
 
@@ -291,63 +310,24 @@ Lacunas atuais:
 
 ---
 
-## Roadmap de estudo
+## Escopo final da v1
 
-O roadmap foi reorganizado para refletir melhor o estado real do projeto e a ordem de aprendizado mais util.
+Esta `v1` deve ser lida como encerrada na seguinte fronteira funcional:
 
-### Fase 0 - Foundation
+- auth e multi-tenant
+- catalogo interno de filmes
+- salas
+- sessoes
+- mapa de assentos por sessao
+- reservas operacionais
 
-Status: concluido
+Isso fecha a historia principal do backend operacional do cinema:
 
-### Fase 1 - IAM / Auth
+`tenant -> auth -> movie -> room -> session -> seats -> reservation`
 
-Status: avancado
+Tudo o que vier depois disso deixa de ser requisito desta versao e pode virar novo estudo ou novo projeto.
 
-### Fase 2 - Multi-tenant & RBAC
-
-Status: parcial
-
-### Fase 3 - Catalogo interno
-
-Status: em andamento
-
-### Fase 4 - Integracao externa de catalogo
-
-Status: em andamento
-
-### Fase 5 - Assentos e mapa da sessao
-
-Status: planejado
-
-### Fase 6 - Reserva com concorrencia
-
-Status: planejado
-
-### Fase 7 - Pedidos e checkout
-
-Status: planejado
-
-### Fase 8 - Tickets e check-in
-
-Status: planejado
-
-### Fase 9 - Observabilidade
-
-Status: planejado
-
-### Fase 10 - Cache & performance
-
-Status: planejado
-
-### Fase 11 - IA aplicada ao SaaS
-
-Status: planejado
-
-### Fase 12 - CI/CD & deploy
-
-Status: planejado
-
-Para mais detalhes, consulte `roadmap.md`.
+Para mais contexto historico de evolucao, consulte `roadmap.md`.
 
 ---
 

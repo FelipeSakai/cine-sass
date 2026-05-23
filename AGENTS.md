@@ -12,9 +12,9 @@ Contexto importante: este e um projeto de estudos, mas com intencao de simular u
 
 - Nome: `CineSaaS`
 - Tipo: backend SaaS multi-tenant para cinemas
-- Foco principal: estudos avancados de arquitetura backend, auth, multi-tenant, concorrencia, observabilidade e IA aplicada
-- Estagio atual: fundacao pronta, IAM/Auth avancado, `movies`, `rooms`, `sessions` e `session-seats` operacionais, com modelagem inicial de `reservations` iniciada
-- Dominio implementado hoje: `iam`, `movies`, `rooms`, `sessions`, `session-seats` e modelagem inicial de `reservations`
+- Foco principal: estudos avancados de arquitetura backend, auth, multi-tenant e concorrencia aplicada ao dominio operacional do cinema
+- Estagio atual: projeto em fechamento de `v1`, com fundacao pronta, IAM/Auth avancado, `movies`, `rooms`, `sessions`, `session-seats` e `reservations` operacionais
+- Dominio implementado hoje: `iam`, `movies`, `rooms`, `sessions`, `session-seats` e `reservations`
 - Estilo arquitetural: modular, orientado a dominio, com controllers finos e regras nos services
 
 ## Intencao do projeto
@@ -55,7 +55,8 @@ Diretriz pratica no estado atual do projeto:
 
 - o modulo `movies` esta considerado consolidado o bastante para os objetivos de estudo atuais
 - evitar gastar ciclos excessivos em polimento incremental de `movies` se isso nao destravar aprendizado novo
-- os proximos estudos devem priorizar a cadeia operacional do cinema: salas, sessoes, mapa de assentos e reservas
+- o escopo principal deste repositorio deve ser encerrado em `reservations`
+- novas trilhas de estudo com tecnologias adicionais devem preferencialmente virar projetos futuros, e nao extensoes infinitas deste repo
 
 ## Stack atual
 
@@ -118,11 +119,18 @@ Specs importantes hoje:
 - `specs/rooms-and-sessions-module.md`: direcao de planejamento para os proximos modulos operacionais de salas e sessoes
 - `specs/sessions-module.md`: spec detalhada da primeira entrega do modulo `sessions`, alinhada ao estado atual de `movies` e `rooms`
 - `specs/session-seats-module.md`: spec detalhada da proxima entrega de mapa de assentos por sessao, preparando a evolucao para reservas com concorrencia
-- `specs/reservations-module.md`: spec detalhada da proxima fase de reservas com concorrencia, hold temporario e confirmacao segura sobre `session_seats`
+- `specs/reservations-module.md`: spec detalhada do modulo `reservations`, usada como referencia de consolidacao final da `v1`
 
 ## Estado real da implementacao
 
-Hoje o sistema e uma API backend de processo unico, com IAM maduro para a fase atual, `movies` funcional como catalogo interno, `rooms` operacional, `sessions` com primeira entrega funcional, `session-seats` com leitura e bloqueio operacional manual iniciais, e `reservations` com criacao de hold, confirmacao, cancelamento, expiracao lazy e leitura operacional iniciais.
+Hoje o sistema e uma API backend de processo unico, com IAM maduro para a fase atual, `movies` funcional como catalogo interno, `rooms` operacional, `sessions` operacional, `session-seats` com leitura e bloqueio operacional manual, e `reservations` com hold, confirmacao, cancelamento, expiracao lazy, leitura operacional e concorrencia basica.
+
+Leitura estrategica atual:
+
+- este repositorio esta em fase de fechamento de `v1`
+- a fronteira deliberada da `v1` e a reserva operacional de assentos
+- `orders/checkout`, tickets, filas, observabilidade pesada e IA deixam de ser proximos passos obrigatorios deste repo
+- futuras exploracoes de tecnologias novas devem preferencialmente acontecer em projetos menores separados
 
 O modulo `movies` ja implementa busca em provider externo, importacao para catalogo interno por tenant e listagem de filmes importados, mantendo o contrato arquitetural do projeto.
 
@@ -201,7 +209,7 @@ Ja existe implementacao para:
 - bloqueio de sobreposicao entre sessoes `SCHEDULED` na mesma sala
 - RBAC de escrita permitindo `OWNER`, `ADMIN` e `STAFF`
 
-### Session Seats com Tasks 2 e 3 concluidas
+### Session Seats implementado no escopo da v1
 
 Ja existe implementacao para:
 
@@ -217,9 +225,9 @@ Ja existe implementacao para:
 
 Ainda nao existe nesta fase:
 
-- reservas ou holds concorrentes funcionais
+- expiracao automatica por worker
 
-### Reservations com Tasks 1, 2, 3 e 4 iniciadas no codigo
+### Reservations implementado no escopo principal da v1
 
 Ja existe implementacao para:
 
@@ -227,12 +235,12 @@ Ja existe implementacao para:
 - tabela `catalog.reservations`
 - tabela `catalog.reservation_seats`
 - estado `HELD` adicionado ao enum de `session_seats`
-- `POST /sessions/:sessionId/reservations` para criacao inicial de hold
-- `GET /reservations/:reservationId` para leitura operacional inicial da reserva
+- `POST /sessions/:sessionId/reservations` para criacao de hold
+- `GET /reservations/:reservationId` para leitura operacional da reserva
 - `POST /reservations/:reservationId/confirm` para confirmar hold
 - `POST /reservations/:reservationId/cancel` para cancelar hold
-- repositories Drizzle iniciais do modulo
-- services transacionais iniciais para segurar, confirmar, cancelar, expirar lazy e ler reservas
+- repositories Drizzle do modulo
+- services transacionais para segurar, confirmar, cancelar, expirar lazy e ler reservas
 - spec propria em `specs/reservations-module.md`
 - testes E2E validados localmente para hold, confirmacao, cancelamento, expiracao lazy, leitura e concorrencia basica
 
@@ -372,6 +380,7 @@ Cobertura atual relevante:
 - fluxo inicial de `rooms` com criacao por `STAFF`, validacao de layout, patch e isolamento por tenant
 - fluxo inicial de `sessions` com criacao por `STAFF`, snapshot de layout, conflito de horario e isolamento por tenant
 - materializacao inicial de `session_seats` a partir do snapshot da sessao, incluindo filtragem de assentos inativos e congelamento apos alteracao da sala
+- fluxo principal de `reservations` com hold, confirmacao, cancelamento, expiracao lazy, leitura e concorrencia basica
 
 Lacunas percebidas hoje:
 
@@ -398,15 +407,7 @@ Fases definidas hoje:
 5. Integracao externa de catalogo
 6. Assentos e mapa da sessao
 7. Reserva com concorrencia
-8. Pedidos e checkout
-8.5. Auditoria e eventos de dominio
-9. Filas e jobs assincronos
-10. Tickets e check-in
-11. Observabilidade
-12. Cache & performance
-12.5. Storage e arquivos
-13. IA aplicada ao SaaS
-14. CI/CD & deploy
+8. Estudos futuros fora do escopo da `v1`
 
 Leitura honesta do estado atual:
 
@@ -414,13 +415,13 @@ Leitura honesta do estado atual:
 - modulo 1 esta bem mais avancado do que o README sugere
 - parte do modulo 2 ja comecou na pratica (tenant context + roles + membership checks)
 - modulo 3 ja comecou funcionalmente com catalogo interno inicial
-- `rooms` e `sessions` ja iniciaram a cadeia operacional do cinema, e `session-seats` agora cobre leitura e bloqueio operacional manual do mapa por sessao, enquanto `reservations` ja iniciou hold, confirmacao, cancelamento, expiracao lazy e leitura, mas ainda nao fechou a fase de concorrencia completa
+- `rooms`, `sessions`, `session-seats` e `reservations` ja fecham a cadeia operacional principal da `v1`
 - a integracao externa inicial com TMDB tambem ja comecou na pratica
 - para fins de roadmap de estudo, `movies` nao precisa de consolidacao extensa antes de o projeto avancar para `rooms`/salas e `sessions`
 - `sessions` agora cobre a primeira agenda operacional por sala, com snapshot de layout e prevencao de conflito de horario
 - `session-seats` agora possui materializacao persistida, leitura operacional, suporte a `HELD` e bloqueio manual por assento
-- o proximo passo planejado agora e implementar reservas com concorrencia sobre `session_seats`
-- `specs/reservations-module.md` passa a ser a referencia principal da fase atual em andamento
+- o proximo passo pratico agora e consolidar `reservations`, revisar docs e encerrar a `v1`
+- `specs/reservations-module.md` passa a ser referencia de consolidacao, e nao de expansao de escopo para checkout
 - `specs/sessions-module.md` passa a servir como memoria da primeira entrega do modulo e referencia para sua evolucao
 
 ## Inconsistencias atuais entre docs e codigo
@@ -449,8 +450,6 @@ Se uma futura IA tocar neste projeto, deve preservar salvo instrucao contraria:
 
 Nao assumir como implementado, a menos que o codigo mude:
 
-- mapa de assentos
-- reservas concorrentes
 - pedidos e checkout
 - tickets e check-in
 - filas e jobs assincronos em producao
@@ -462,6 +461,11 @@ Nao assumir como implementado, a menos que o codigo mude:
 - CI/CD pronto
 - deploy da API via Docker Compose atual
 - signup publico tradicional separado do fluxo de criacao de tenant owner
+
+Observacao:
+
+- `session-seats` e `reservations` basicos ja existem e nao devem mais ser tratados como pendentes genericos
+- o que resta neles e consolidacao de `v1`, nao abertura de nova frente funcional grande
 
 ## Como futuras IAs devem atualizar este arquivo
 
@@ -495,4 +499,4 @@ Quando houver conflito entre narrativa e implementacao:
 
 ## Ultima leitura consolidada
 
-Baseado no estado atual do repositorio em `Thu Apr 23 2026`, ja considerando a leitura operacional inicial do modulo `session-seats`.
+Baseado no estado atual do repositorio em `Fri May 22 2026`, ja considerando a decisao de encerrar o projeto como `v1` na fronteira de `reservations`.

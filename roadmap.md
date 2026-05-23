@@ -1,6 +1,6 @@
 # CineSaaS - Roadmap realista de estudo
 
-Este roadmap existe para guiar o aprendizado e a evolucao do projeto de forma honesta.
+Este roadmap existe para registrar a evolucao do projeto de forma honesta e tambem a decisao deliberada de manter o repositorio finito.
 
 Ele nao deve ser lido como promessa de feature pronta. Ele deve refletir:
 
@@ -43,6 +43,11 @@ Regra pratica:
 
 cada fase precisa ficar boa o bastante para suportar a proxima com clareza, e nao necessariamente exaustiva em nivel de producao real.
 
+Decisao atual importante:
+
+- o escopo principal do `CineSaaS` sera encerrado na `v1` na fronteira de `reservations`
+- `orders/checkout`, tickets, filas, observabilidade pesada, IA e outras trilhas ficam como estudos futuros opcionais, preferencialmente em projetos separados
+
 Outra regra importante: este roadmap precisa ter fim.
 
 O objetivo nao e transformar o projeto em uma colecao infinita de tecnologias. Novas fases so devem entrar quando:
@@ -73,7 +78,8 @@ Hoje o projeto esta assim:
 - modulo 0 (`Foundation`) concluido
 - modulo 1 (`Auth & Users`) bem avancado
 - modulo 2 (`Multi-tenant & RBAC`) iniciado na pratica e parcialmente implementado
-- ainda nao existe modulo funcional de catalogo, sessoes, assentos, reservas, pedidos ou tickets
+- `movies`, `rooms`, `sessions`, `session-seats` e `reservations` ja existem em versao funcional
+- o repositorio entrou em fase de fechamento de `v1`, e nao de expansao para todo o roadmap historico
 
 Isso significa que o roadmap antigo estava correto como intencao, mas desatualizado como retrato do estado atual.
 
@@ -97,7 +103,7 @@ Ela nao significa que tudo isso ja esta no projeto hoje.
 - Vitest
 - Supertest
 
-### Previstas para as proximas fases
+### Previstas para estudos futuros
 
 - Redis: cache, invalidacao e possivelmente apoio a fluxos temporarios
 - BullMQ ou equivalente: filas e jobs assincronos com workers
@@ -241,7 +247,7 @@ Isolamento real entre tenants, autorizacao por contexto e modelagem SaaS.
 
 ## Fase 3 - Catalogo interno
 
-Status: em andamento
+Status: funcional no escopo da `v1`
 
 ### Objetivo de estudo
 
@@ -277,7 +283,7 @@ Modelagem de entidades de negocio, relacionamentos e CRUD com regras reais.
 
 ## Fase 4 - Integracao externa de catalogo
 
-Status: em andamento
+Status: funcional no escopo da `v1`
 
 ### Objetivo de estudo
 
@@ -310,7 +316,7 @@ Integracao com servico externo, resiliencia e fronteira entre sistema interno e 
 
 ## Fase 4.5 - Contratos de API e documentacao viva
 
-Status: planejado
+Status: parcial
 
 ### Objetivo de estudo
 
@@ -337,7 +343,7 @@ Aprender a tratar contrato de API como parte do produto, com schemas claros, doc
 
 ## Fase 5 - Assentos e mapa da sessao
 
-Status: planejado
+Status: funcional no escopo da `v1`
 
 ### Objetivo de estudo
 
@@ -364,7 +370,7 @@ Modelagem de estado, estrutura derivada e regras de disponibilidade.
 
 ## Fase 6 - Reserva com concorrencia
 
-Status: planejado
+Status: funcional com consolidacao final pendente para encerrar a `v1`
 
 ### Objetivo de estudo
 
@@ -391,7 +397,7 @@ Consistencia, transacao, lock, idempotencia parcial e tratamento de corrida.
 
 ## Fase 7 - Pedidos e checkout
 
-Status: planejado
+Status: fora do escopo da `v1`
 
 ### Objetivo de estudo
 
@@ -419,7 +425,7 @@ Fluxos financeiros simulados, idempotencia e confirmacao de operacoes.
 
 ## Fase 7.5 - Auditoria e eventos de dominio
 
-Status: planejado
+Status: estudo futuro opcional
 
 ### Objetivo de estudo
 
@@ -446,7 +452,7 @@ Aprender rastreabilidade de mudancas importantes, eventos de negocio e historico
 
 ## Fase 8 - Filas e jobs assincronos
 
-Status: planejado
+Status: estudo futuro opcional
 
 ### Objetivo de estudo
 
@@ -485,7 +491,7 @@ Aprender processamento assincrono, retries, idempotencia e separacao entre traba
 
 ## Fase 9 - Tickets e check-in
 
-Status: planejado
+Status: fora do escopo da `v1`
 
 ### Objetivo de estudo
 
@@ -512,7 +518,7 @@ Validacao operacional, auditoria e regras de consumo de ingresso.
 
 ## Fase 10 - Observabilidade
 
-Status: planejado
+Status: estudo futuro opcional
 
 ### Objetivo de estudo
 
@@ -539,7 +545,7 @@ Diagnostico de aplicacao, visibilidade operacional e maturidade tecnica.
 
 ## Fase 11 - Cache & performance
 
-Status: planejado
+Status: estudo futuro opcional
 
 ### Objetivo de estudo
 
@@ -566,7 +572,7 @@ Reducao de custo de leitura, invalidacao e analise de gargalos.
 
 ## Fase 11.5 - Storage e arquivos
 
-Status: planejado
+Status: estudo futuro opcional
 
 ### Objetivo de estudo
 
@@ -593,7 +599,7 @@ Aprender upload, armazenamento, validacao e metadados de arquivos em fluxos comu
 
 ## Fase 12 - IA aplicada ao SaaS
 
-Status: planejado
+Status: estudo futuro opcional
 
 ### Objetivo de estudo
 
@@ -623,7 +629,7 @@ RAG multi-tenant com isolamento e integracao segura ao dominio.
 
 ## Fase 13 - CI/CD & deploy
 
-Status: planejado
+Status: estudo futuro opcional
 
 ### Objetivo de estudo
 
@@ -651,41 +657,17 @@ Fechar o ciclo de engenharia ate entrega e operacao.
 
 ## Ordem sugerida daqui para frente
 
-Para maximizar aprendizado tecnico sem perder coerencia de sistema, a ordem mais forte daqui em diante e:
+Para encerrar este repositorio sem inflacao de escopo, a ordem mais forte daqui em diante e:
 
-1. consolidar Fase 1 e Fase 2
-2. construir Catalogo interno
-3. consolidar contratos de API e documentacao viva
-4. integrar provider externo
-5. modelar assentos
-6. enfrentar concorrencia nas reservas
-7. implementar pedidos e checkout
-8. adicionar auditoria e eventos de dominio
-9. adicionar filas e jobs assincronos
-10. gerar tickets e check-in
-11. adicionar observabilidade
-12. adicionar cache/performance
-13. adicionar storage de arquivos
-14. explorar IA com RAG multi-tenant
-15. fechar com CI/CD e deploy
+1. consolidar `reservations`
+2. revisar pequenos contratos e incoerencias da API
+3. alinhar `readme.md`, `AGENTS.md` e este `roadmap.md`
+4. rodar build e testes principais
+5. encerrar o `CineSaaS v1`
 
-Essa ordem faz sentido porque prioriza aprendizado progressivo:
+Essa ordem faz sentido porque o objetivo agora nao e abrir novos modulos, e sim terminar o projeto principal com uma fronteira funcional clara.
 
-- primeiro dominio e modelagem
-- depois contratos de API mais claros
-- depois integracao externa
-- depois consistencia e concorrencia
-- depois auditabilidade
-- depois processamento assincrono
-- depois operacao, performance, storage e IA
-
-A prioridade aqui nao e blindar cada fase ao maximo antes da seguinte.
-
-A prioridade e chegar a um nivel suficientemente profissional para que cada modulo:
-
-- faca sentido arquiteturalmente
-- ensine uma tecnologia ou habilidade nova
-- deixe o sistema pronto para o proximo passo
+Depois da `v1`, novas tecnologias devem preferencialmente virar projetos menores e focados.
 
 Tecnologias interessantes que ficaram propositalmente fora deste roadmap principal, para evitar escopo infinito:
 
@@ -701,44 +683,23 @@ Esses temas podem virar projetos futuros quando o objetivo for estudar distribui
 
 ## Janela de conclusao sugerida
 
-Para manter este projeto finito e com boa energia de execucao, a janela mais saudavel para concluir o roadmap principal e entre 4 e 6 meses.
+Para manter este projeto finito e com boa energia de execucao, a leitura atual e que ele deve ser encerrado assim que a consolidacao final da `v1` terminar.
 
 Leitura pratica:
 
-- 2 a 3 meses: ritmo forte, com bastante frequencia e pouca dispersao
-- 4 meses: alvo recomendado para manter foco e ainda absorver bem o aprendizado
-- 5 a 6 meses: ritmo mais confortavel, ainda valido sem deixar o projeto eterno
-- mais de 6 meses: aumenta o risco de perda de foco, inflacao de escopo e fadiga
+- prolongar este repo com novas fases grandes aumenta o risco de perda de foco e fadiga
+- encerrar a `v1` agora preserva o valor de portfolio e libera espaco para novos estudos com stack diferente
 
-Este prazo considera que nem toda fase precisa ser exaustiva. O objetivo e concluir o projeto principal com versoes suficientemente boas, coerentes e didaticas dos modulos planejados.
+O objetivo agora e concluir o projeto principal com uma versao suficientemente boa, coerente e didatica ate `reservations`.
 
 ### Cronograma sugerido
 
-#### Mes 1
+#### Fechamento da v1
 
-- consolidar minimamente Fase 1 e Fase 2
-- iniciar e fechar o nucleo da Fase 3
-- avancar na Fase 4.5 com contratos principais da API
-
-#### Mes 2
-
-- avancar na Fase 5
-- implementar o nucleo da Fase 6
-- iniciar a Fase 8 com o fluxo principal de pedidos
-
-#### Mes 3
-
-- consolidar Fase 8
-- implementar Fase 8.5
-- implementar Fase 9 com pelo menos um fluxo assincrono real
-- avancar na Fase 10
-
-#### Mes 4
-
-- consolidar Fase 10
-- implementar Fase 11
-- implementar Fase 12 em versao enxuta
-- avancar em Fase 12.5, Fase 13 e fechamento do projeto
+- consolidar `reservations`
+- fechar docs e contratos principais
+- validar build e testes
+- marcar o repositorio como encerrado na fronteira operacional de reservas
 
 ### Regra de acompanhamento
 
