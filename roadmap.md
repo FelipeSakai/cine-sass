@@ -2,6 +2,8 @@
 
 Este roadmap existe para registrar a evolucao do projeto de forma honesta e tambem a decisao deliberada de manter o repositorio finito.
 
+Status atual consolidado: o backend entrou em fase de encerramento de `v1` na fronteira de `reservations`. O foco restante deste repositorio e consolidacao final de documentacao, testes, consistencia e registro arquitetural, e nao abertura de novos modulos grandes.
+
 Ele nao deve ser lido como promessa de feature pronta. Ele deve refletir:
 
 - o que ja foi implementado de verdade
@@ -80,6 +82,12 @@ Hoje o projeto esta assim:
 - modulo 2 (`Multi-tenant & RBAC`) iniciado na pratica e parcialmente implementado
 - `movies`, `rooms`, `sessions`, `session-seats` e `reservations` ja existem em versao funcional
 - o repositorio entrou em fase de fechamento de `v1`, e nao de expansao para todo o roadmap historico
+
+Leitura pratica para encerramento:
+
+- a historia funcional principal do backend ja esta fechada
+- a API da `v1` deve ser considerada documentada pela combinacao de `readme.md`, `AGENTS.md` e Swagger/OpenAPI em `/docs`
+- futuras exploracoes como filas, frontend e observabilidade pesada devem ser tratadas como novos estudos, nao como extensao obrigatoria deste repo
 
 Isso significa que o roadmap antigo estava correto como intencao, mas desatualizado como retrato do estado atual.
 

@@ -1,5 +1,8 @@
 import fastify from "fastify";
 import jwt from "@fastify/jwt";
+import swagger from "@fastify/swagger";
+import swaggerUi from "@fastify/swagger-ui";
+import { dirname, resolve } from "node:path";
 
 import { errorHandler } from "src/shared/errors/error-handler";
 import { loggerOptions } from "src/shared/logger";
@@ -24,6 +27,23 @@ export async function buildApp() {
     secret: env.JWT_SECRET,
     sign: {
       expiresIn: env.JWT_ACCESS_TTL,
+    },
+  });
+
+  await app.register(swagger, {
+    mode: "static",
+    specification: {
+      path: resolve(process.cwd(), "specs/openapi-v1.json"),
+      baseDir: dirname(resolve(process.cwd(), "specs/openapi-v1.json")),
+    },
+  });
+
+  await app.register(swaggerUi, {
+    routePrefix: "/docs",
+    staticCSP: true,
+    uiConfig: {
+      docExpansion: "list",
+      deepLinking: false,
     },
   });
 

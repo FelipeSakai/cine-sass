@@ -18,7 +18,12 @@ Na versao `v1` encerrada neste repositorio, a aplicacao permite:
 - consultar e operar o mapa de assentos por sessao
 - criar hold, confirmar e cancelar reservas operacionais
 
-Fora do escopo desta `v1` ficam deliberadamente `orders/checkout`, pagamento, tickets, check-in, filas, observabilidade pesada e IA. Essas trilhas podem virar projetos futuros.
+Fora do escopo desta `v1` ficam deliberadamente `orders/checkout`, pagamento, tickets, check-in, filas, expiracao automatica por worker, observabilidade pesada, frontend e IA. Essas trilhas podem virar projetos futuros.
+
+Documentacao HTTP em estilo Swagger da `v1`:
+
+- UI: `/docs`
+- JSON OpenAPI: `/docs/json`
 
 ---
 
@@ -205,6 +210,8 @@ Ainda nao ha implementacao real para:
 - `GET /protected/admin-ping`
 - `POST /members`
 - `GET /members`
+- `PATCH /members/:userId/role`
+- `DELETE /members/:userId`
 - `GET /movies/search`
 - `POST /movies/import`
 - `GET /movies`
@@ -222,6 +229,8 @@ Ainda nao ha implementacao real para:
 - `GET /reservations/:reservationId`
 - `POST /reservations/:reservationId/confirm`
 - `POST /reservations/:reservationId/cancel`
+
+Referencia interativa das rotas da `v1`: Swagger em `/docs`
 
 ---
 
@@ -321,6 +330,8 @@ Esta `v1` deve ser lida como encerrada na seguinte fronteira funcional:
 - mapa de assentos por sessao
 - reservas operacionais
 
+Essa fronteira e intencional. O projeto pode receber apenas consolidacoes pequenas de documentacao, testes e consistencia, sem abrir novas frentes grandes de produto dentro deste repositorio.
+
 Isso fecha a historia principal do backend operacional do cinema:
 
 `tenant -> auth -> movie -> room -> session -> seats -> reservation`
@@ -371,6 +382,18 @@ npm run db:seed
 
 ```bash
 npm run dev
+```
+
+### Testes
+
+```bash
+npm run test:e2e
+```
+
+Para build local:
+
+```bash
+npm run build
 ```
 
 ---

@@ -500,3 +500,8 @@ Quando houver conflito entre narrativa e implementacao:
 ## Ultima leitura consolidada
 
 Baseado no estado atual do repositorio em `Fri May 22 2026`, ja considerando a decisao de encerrar o projeto como `v1` na fronteira de `reservations`.
+
+Atualizacao complementar:
+
+- a consolidacao final da documentacao da `v1` agora tambem inclui uma referencia Swagger/OpenAPI servida pelo backend em `/docs`
+- sem frontend neste repositorio, o encerramento esperado passa a ser documentacao, validacao final dos testes e fechamento formal do escopo
